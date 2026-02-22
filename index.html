@@ -886,7 +886,9 @@
                         <li>Email support</li>
                         <li>All AI platforms included</li>
                     </ul>
-                    <a href="#cta" class="btn btn-secondary" style="width: 100%;">Start 14-Day Trial</a>
+                    <button onclick="createCheckout(event, 'solo')" class="btn btn-secondary" style="width: 100%;">
+  Start 14-Day Trial
+</button>
                 </div>
 
                 <!-- Team Plan (Featured) -->
@@ -907,7 +909,9 @@
                         <li>Export audit reports</li>
                         <li>All AI platforms included</li>
                     </ul>
-                    <a href="#cta" class="btn btn-primary" style="width: 100%;">Start 14-Day Trial</a>
+                    <button onclick="createCheckout(event, 'team')" class="btn btn-primary" style="width: 100%;">
+  Start 14-Day Trial
+</button>
                 </div>
 
                 <!-- Enterprise Plan -->
@@ -1108,5 +1112,72 @@
             });
         });
     </script>
+    <script>
+// =============================
+// CONFIGURAÇÃO STRIPE
+// =============================
+const BACKEND_URL = 'https://ai-shield-backend-production.up.railway.app';
+
+const PRICE_IDS = {
+  solo: 'price_xxxxxxxxxxxxxxxxxxxxx',
+  team: 'price_xxxxxxxxxxxxxxxxxxxxx'
+};
+
+// =============================
+// CHECKOUT FUNCTION
+// =============================
+async function createCheckout(event, planType) {
+  const button = event.currentTarget;
+
+  // Coletar dados do usuário
+  const email = prompt('Digite seu email:');
+  if (!email) return;
+
+  const companyName = prompt('Digite o nome da sua empresa:');
+  if (!companyName) return;
+
+  // Validação simples
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    alert('Email inválido!');
+    return;
+  }
+
+  const originalText = button.textContent;
+
+  try {
+    button.textContent = 'Processando...';
+    button.disabled = true;
+
+    const response = await fetch(`${BACKEND_URL}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        priceId: PRICE_IDS[planType],
+        planType,
+        email,
+        companyName
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao criar checkout');
+    }
+
+    const data = await response.json();
+
+    if (!data.url) {
+      throw new Error('URL de checkout não retornada');
+    }
+
+    window.location.href = data.url;
+
+  } catch (error) {
+    console.error('Erro no checkout:', error);
+    alert('Erro ao processar pagamento. Tente novamente.');
+    button.textContent = originalText;
+    button.disabled = false;
+  }
+}
+</script>
 </body>
 </html>
