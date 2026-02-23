@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Your Free Trial - AI Shield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #001a3d 0%, #003d7a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .signup-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .signup-header {
+            background: linear-gradient(135deg, #001a3d 0%, #003d7a 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .signup-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .signup-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .plan-badge {
+            display: inline-block;
+            background: rgba(0, 168, 232, 0.2);
+            color: #00d4ff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 16px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .signup-body {
+            padding: 40px;
+        }
+
+        .features {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .features h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #001a3d;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .features ul {
+            list-style: none;
+        }
+
+        .features li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00a8e8;
+            box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00a8e8 0%, #0086ba 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 168, 232, 0.3);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #00a8e8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            display: none;
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 16px;
+            color: #00a8e8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <div class="logo">🛡️</div>
+            <h1>Start Your Free Trial</h1>
+            <p>14 days of complete protection</p>
+            <div class="plan-badge" id="planBadge">Solo Plan</div>
+        </div>
+
+        <div class="signup-body">
+            <div class="features" id="featuresBox">
+                <!-- Features will be populated by JavaScript -->
+            </div>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="email">Work Email *</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="you@company.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="companyName">Company Name *</label>
+                    <input 
+                        type="text" 
+                        id="companyName" 
+                        name="companyName" 
+                        placeholder="Your Company Ltd." 
+                        required
+                        autocomplete="organization"
+                    >
+                </div>
+
+                <button type="submit" class="submit-button" id="submitBtn">
+                    Continue to Payment →
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Creating your checkout session...</p>
+                </div>
+
+                <div class="error-message" id="errorMessage">
+                    <!-- Error will be displayed here -->
+                </div>
+
+                <div class="footer-note">
+                    ✓ No credit card required for trial<br>
+                    ✓ Cancel anytime<br>
+                    ✓ GDPR compliant
+                </div>
+
+                <center>
+                    <a href="/" class="back-link">← Back to pricing</a>
+                </center>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO - ATUALIZE ESTAS CHAVES!
+        // ============================================
+        
+        const CONFIG = {
+            // Backend URL
+            BACKEND_URL: 'https://ai-shield-backend-production.up.railway.app',
+            
+            // Stripe Price IDs (ATUALIZE COM SUAS CHAVES!)
+            PRICE_IDS: {
+                solo: 'price_1T3QiCAAlh231uCgvbn0cNKm',
+                team: 'price_1T3QgHAAlh231uCguwAXkVHT'
+            }
+        };
+
+        // ============================================
+        // DETECTAR PLANO DA URL
+        // ============================================
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const plan = urlParams.get('plan') || 'solo';
+        
+        // ============================================
+        // CONFIGURAÇÃO DOS PLANOS
+        // ============================================
+        
+        const planConfig = {
+            solo: {
+                name: 'Solo Plan',
+                price: '€9/month',
+                features: [
+                    '1 protected user',
+                    '25+ data types detection',
+                    'Real-time alerts',
+                    'Personal dashboard',
+                    'Monthly compliance reports',
+                    'Email support'
+                ]
+            },
+            team: {
+                name: 'Team Plan',
+                price: '€39/month',
+                features: [
+                    'Up to 10 protected users',
+                    '25+ data types detection',
+                    'Real-time alerts',
+                    'Team management dashboard',
+                    'Monthly compliance reports',
+                    'Priority email support',
+                    'User activity tracking',
+                    'Export audit reports'
+                ]
+            }
+        };
+
+        // ============================================
+        // ATUALIZAR UI COM PLANO SELECIONADO
+        // ============================================
+        
+        const selectedPlan = planConfig[plan] || planConfig.solo;
+        
+        document.getElementById('planBadge').textContent = 
+            `${selectedPlan.name} - ${selectedPlan.price}`;
+        
+        const featuresHTML = `
+            <h3>What's Included:</h3>
+            <ul>
+                ${selectedPlan.features.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+        `;
+        
+        document.getElementById('featuresBox').innerHTML = featuresHTML;
+
+        // ============================================
+        // PROCESSAR FORMULÁRIO
+        // ============================================
+        
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const companyName = document.getElementById('companyName').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Validar
+            if (!email || !companyName) {
+                showError('Please fill in all required fields');
+                return;
+            }
+            
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            // Validar configuração
+            const priceId = CONFIG.PRICE_IDS[plan];
+            if (priceId.includes('COLE_SEU_PRICE_ID')) {
+                showError('Configuration error: Please update Price IDs in the code');
+                console.error('Update PRICE_IDS in the CONFIG object');
+                return;
+            }
+            
+            // Mostrar loading
+            submitBtn.disabled = true;
+            loading.classList.add('active');
+            errorMessage.classList.remove('active');
+            
+            try {
+                console.log('Creating checkout session...');
+                
+                // Criar sessão de checkout no backend
+                const response = await fetch(`${CONFIG.BACKEND_URL}/api/checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        priceId: priceId,
+                        planType: plan,
+                        email: email,
+                        companyName: companyName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to create checkout session');
+                }
+                
+                if (!data.url) {
+                    throw new Error('Checkout URL not returned');
+                }
+                
+                console.log('Checkout session created! Redirecting to Stripe...');
+                
+                // Redirecionar para Stripe Checkout
+                window.location.href = data.url;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message || 'An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                loading.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // FUNÇÃO DE ERRO
+        // ============================================
+        
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('active');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
