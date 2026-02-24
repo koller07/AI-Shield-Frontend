@@ -239,15 +239,15 @@
             <div class="logo">🛡️</div>
             <h1>Start Your Free Trial</h1>
             <p>14 days of complete protection</p>
-            <div class="plan-badge" id="planBadge">Solo Plan</div>
+            <div class="plan-badge" id="planBadge">Loading...</div>
         </div>
 
         <div class="signup-body">
             <div class="features" id="featuresBox">
-                <!-- Features will be populated by JavaScript -->
+                <h3>Loading plan details...</h3>
             </div>
 
-            <form id="signupForm">
+            <form id="signupForm" onsubmit="handleSubmit(event)">
                 <div class="form-group">
                     <label for="email">Work Email *</label>
                     <input 
@@ -281,9 +281,7 @@
                     <p>Creating your checkout session...</p>
                 </div>
 
-                <div class="error-message" id="errorMessage">
-                    <!-- Error will be displayed here -->
-                </div>
+                <div class="error-message" id="errorMessage"></div>
 
                 <div class="footer-note">
                     ✓ No credit card required for trial<br>
@@ -304,23 +302,13 @@
         // ============================================
         
         const CONFIG = {
-            // Backend URL
             BACKEND_URL: 'https://ai-shield-backend-production.up.railway.app',
-            
-            // Stripe Price IDs (ATUALIZE COM SUAS CHAVES!)
             PRICE_IDS: {
-                solo: price_1T3QiCAAlh231uCgvbn0cNKm,
-                team: price_1T3QgHAAlh231uCguwAXkVHT
+                solo: 'price_1T3QiCAAlh231uCgvbn0cNKm',
+                team: 'price_1T3QgHAAlh231uCguwAXkVHT'
             }
         };
 
-        // ============================================
-        // DETECTAR PLANO DA URL
-        // ============================================
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const plan = urlParams.get('plan') || 'solo';
-        
         // ============================================
         // CONFIGURAÇÃO DOS PLANOS
         // ============================================
@@ -355,35 +343,75 @@
         };
 
         // ============================================
-        // ATUALIZAR UI COM PLANO SELECIONADO
+        // DETECTAR PLANO DA URL E ATUALIZAR UI
         // ============================================
         
-        const selectedPlan = planConfig[plan] || planConfig.solo;
+        let selectedPlan = 'solo'; // default
         
-        document.getElementById('planBadge').textContent = 
-            `${selectedPlan.name} - ${selectedPlan.price}`;
-        
-        const featuresHTML = `
-            <h3>What's Included:</h3>
-            <ul>
-                ${selectedPlan.features.map(f => `<li>${f}</li>`).join('')}
-            </ul>
-        `;
-        
-        document.getElementById('featuresBox').innerHTML = featuresHTML;
+        // Executar quando a página carregar
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Página carregada, detectando plano...');
+            
+            // Pegar plano da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const planFromUrl = urlParams.get('plan');
+            
+            if (planFromUrl && (planFromUrl === 'solo' || planFromUrl === 'team')) {
+                selectedPlan = planFromUrl;
+            }
+            
+            console.log('📋 Plano selecionado:', selectedPlan);
+            
+            // Atualizar UI com plano
+            updatePlanUI(selectedPlan);
+        });
+
+        function updatePlanUI(plan) {
+            const config = planConfig[plan];
+            
+            if (!config) {
+                console.error('❌ Configuração do plano não encontrada:', plan);
+                return;
+            }
+            
+            console.log('🎨 Atualizando UI para plano:', plan);
+            
+            // Atualizar badge do plano
+            document.getElementById('planBadge').textContent = 
+                `${config.name} - ${config.price}`;
+            
+            // Atualizar features
+            const featuresHTML = `
+                <h3>What's Included:</h3>
+                <ul>
+                    ${config.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+            `;
+            
+            document.getElementById('featuresBox').innerHTML = featuresHTML;
+            
+            console.log('✅ UI atualizada com sucesso!');
+        }
 
         // ============================================
         // PROCESSAR FORMULÁRIO
         // ============================================
         
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function handleSubmit(event) {
+            // CRÍTICO: Prevenir submit padrão do formulário!
+            event.preventDefault();
+            
+            console.log('📝 Formulário enviado, processando...');
             
             const email = document.getElementById('email').value.trim();
             const companyName = document.getElementById('companyName').value.trim();
             const submitBtn = document.getElementById('submitBtn');
             const loading = document.getElementById('loading');
             const errorMessage = document.getElementById('errorMessage');
+            
+            console.log('📧 Email:', email);
+            console.log('🏢 Empresa:', companyName);
+            console.log('📋 Plano:', selectedPlan);
             
             // Validar
             if (!email || !companyName) {
@@ -396,11 +424,13 @@
                 return;
             }
             
-            // Validar configuração
-            const priceId = CONFIG.PRICE_IDS[plan];
-            if (priceId.includes('COLE_SEU_PRICE_ID')) {
-                showError('Configuration error: Please update Price IDs in the code');
-                console.error('Update PRICE_IDS in the CONFIG object');
+            // Validar Price ID
+            const priceId = CONFIG.PRICE_IDS[selectedPlan];
+            console.log('💰 Price ID:', priceId);
+            
+            if (!priceId || priceId.includes('COLE_SEU_PRICE_ID')) {
+                showError('Configuration error: Invalid Price ID. Please contact support.');
+                console.error('❌ Price ID inválido:', priceId);
                 return;
             }
             
@@ -409,10 +439,31 @@
             loading.classList.add('active');
             errorMessage.classList.remove('active');
             
+            console.log('🚀 Criando sessão de checkout...');
+            
+            // Criar checkout session
+            createCheckoutSession(email, companyName, priceId)
+                .then(url => {
+                    console.log('✅ Sessão criada! Redirecionando para:', url);
+                    window.location.href = url;
+                })
+                .catch(error => {
+                    console.error('❌ Erro ao criar checkout:', error);
+                    showError(error.message || 'An error occurred. Please try again.');
+                    submitBtn.disabled = false;
+                    loading.classList.remove('active');
+                });
+        }
+
+        // ============================================
+        // CRIAR CHECKOUT SESSION
+        // ============================================
+        
+        async function createCheckoutSession(email, companyName, priceId) {
             try {
-                console.log('Creating checkout session...');
+                console.log('📞 Chamando API do backend...');
+                console.log('URL:', `${CONFIG.BACKEND_URL}/api/checkout`);
                 
-                // Criar sessão de checkout no backend
                 const response = await fetch(`${CONFIG.BACKEND_URL}/api/checkout`, {
                     method: 'POST',
                     headers: {
@@ -420,40 +471,42 @@
                     },
                     body: JSON.stringify({
                         priceId: priceId,
-                        planType: plan,
+                        planType: selectedPlan,
                         email: email,
                         companyName: companyName
                     })
                 });
                 
-                const data = await response.json();
+                console.log('📡 Resposta recebida:', response.status);
                 
                 if (!response.ok) {
-                    throw new Error(data.error || 'Failed to create checkout session');
+                    const errorData = await response.json();
+                    console.error('❌ Erro na resposta:', errorData);
+                    throw new Error(errorData.error || 'Failed to create checkout session');
                 }
                 
+                const data = await response.json();
+                console.log('📦 Dados recebidos:', data);
+                
                 if (!data.url) {
+                    console.error('❌ URL de checkout não retornada');
                     throw new Error('Checkout URL not returned');
                 }
                 
-                console.log('Checkout session created! Redirecting to Stripe...');
-                
-                // Redirecionar para Stripe Checkout
-                window.location.href = data.url;
+                return data.url;
                 
             } catch (error) {
-                console.error('Error:', error);
-                showError(error.message || 'An error occurred. Please try again.');
-                submitBtn.disabled = false;
-                loading.classList.remove('active');
+                console.error('❌ Erro na criação do checkout:', error);
+                throw error;
             }
-        });
+        }
 
         // ============================================
         // FUNÇÃO DE ERRO
         // ============================================
         
         function showError(message) {
+            console.error('⚠️ Erro:', message);
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.textContent = message;
             errorMessage.classList.add('active');
@@ -462,6 +515,8 @@
                 errorMessage.classList.remove('active');
             }, 5000);
         }
+        
+        console.log('✅ Script carregado com sucesso!');
     </script>
 </body>
 </html>
