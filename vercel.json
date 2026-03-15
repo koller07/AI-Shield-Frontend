@@ -5,6 +5,10 @@
       "destination": "/admin-dashboard.html"
     },
     {
+      "source": "/company-dashboard",
+      "destination": "/company-dashboard.html"
+    },
+    {
       "source": "/success",
       "destination": "/success.html"
     }
