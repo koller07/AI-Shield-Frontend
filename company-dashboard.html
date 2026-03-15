@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Shield - Company Dashboard</title>
+    <title>AI Shield - Company Dashboard</title>
     
-    <!-- Chart.js via CDN -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <style>
@@ -16,400 +16,402 @@
         }
 
         :root {
-            --primary: #3498db;
-            --primary-dark: #2980b9;
-            --secondary: #9b59b6;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --gray: #7f8c8d;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            /* AI Shield Brand Colors */
+            --primary-dark: #002d5c;
+            --primary-blue: #1e5ba8;
+            --accent-cyan: #00a8e8;
+            --accent-green: #22c55e;
+            --accent-orange: #ff6b35;
+            --accent-red: #ef4444;
+            
+            /* Neutrals */
+            --text-primary: #1a1a2e;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border-color: #e2e8f0;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--dark);
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Login Screen */
-        .login-container {
+        /* ==========================================
+           LAYOUT
+        ========================================== */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================================
+           SIDEBAR
+        ========================================== */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo-img {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .sidebar-logo-img img {
+            width: 36px;
+            height: 36px;
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-nav-item.active {
+            background: var(--accent-cyan);
+            color: white;
+        }
+
+        .sidebar-nav-icon {
+            font-size: 1.25rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .sidebar-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            font-weight: 700;
+            font-size: 1rem;
         }
 
-        .login-box {
-            background: white;
-            padding: 48px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 440px;
-        }
-
-        .login-logo {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .login-logo h1 {
-            font-size: 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-
-        .login-logo p {
-            color: var(--gray);
-            font-size: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--dark);
-            font-size: 14px;
+        .sidebar-user-info h4 {
+            font-size: 0.875rem;
             font-weight: 600;
+            margin-bottom: 0.125rem;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            font-family: 'Monaco', 'Courier New', monospace;
+        .sidebar-user-info p {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
         }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        /* ==========================================
+           MAIN CONTENT
+        ========================================== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2.5rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
         }
 
         .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        .btn-primary {
+            background: var(--accent-green);
+            color: white;
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .btn-primary:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
         }
 
-        .error-message {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 16px;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        /* Dashboard */
-        .dashboard {
-            display: none;
-            min-height: 100vh;
-        }
-
-        .dashboard.show {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Navbar */
-        .navbar {
+        .btn-secondary {
             background: white;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
+            color: var(--primary-dark);
+            border: 1px solid var(--border-color);
         }
 
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .btn-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
         }
 
-        .navbar-brand h1 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .navbar-company {
-            font-size: 14px;
-            color: var(--gray);
-            font-weight: 500;
-        }
-
-        .navbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .btn-logout {
-            padding: 8px 20px;
-            background: transparent;
-            border: 2px solid #e0e0e0;
-            color: var(--dark);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-logout:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 32px;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .page-header {
-            margin-bottom: 32px;
-        }
-
-        .page-header h2 {
-            font-size: 28px;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
-
-        .page-header p {
-            color: var(--gray);
-            font-size: 15px;
-        }
-
-        /* Stats Grid */
+        /* ==========================================
+           STATS CARDS
+        ========================================== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
             background: white;
-            padding: 28px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            padding: 1.75rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .stat-header {
+        .stat-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 1rem;
         }
 
-        .stat-label {
-            font-size: 14px;
-            color: var(--gray);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-icon {
+        .stat-card-icon {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 1.5rem;
         }
 
-        .stat-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 8px;
+        .stat-card-icon.blue {
+            background: rgba(0, 168, 232, 0.1);
+            color: var(--accent-cyan);
         }
 
-        .stat-change {
-            font-size: 13px;
-            color: var(--success);
-            font-weight: 600;
+        .stat-card-icon.green {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
         }
 
-        .stat-change.negative {
-            color: var(--danger);
+        .stat-card-icon.orange {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent-orange);
         }
 
-        /* Tabs */
-        .tabs {
+        .stat-card-icon.red {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
+
+        .stat-card-trend {
             display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            border-bottom: 2px solid #e0e0e0;
-            overflow-x: auto;
-        }
-
-        .tab {
-            padding: 14px 24px;
-            background: transparent;
-            border: none;
-            color: var(--gray);
-            font-size: 15px;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
         }
 
-        .tab:hover {
-            color: var(--dark);
-            background: rgba(102, 126, 234, 0.05);
+        .stat-card-trend.up {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
         }
 
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+        .stat-card-trend.down {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
         }
 
-        .tab-content {
-            display: none;
+        .stat-card-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
 
-        .tab-content.active {
-            display: block;
+        .stat-card-value {
+            font-size: 2.25rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+            line-height: 1;
         }
 
-        /* Cards */
-        .card {
+        .stat-card-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        /* ==========================================
+           CHARTS SECTION
+        ========================================== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .chart-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            margin-bottom: 24px;
+            padding: 1.75rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
         }
 
-        .card-header {
-            padding: 24px 28px;
-            border-bottom: 1px solid #f0f0f0;
+        .chart-card-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-card-header h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .chart-card-header p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* ==========================================
+           DETECTIONS TABLE
+        ========================================== */
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .table-card-header {
+            padding: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .card-title {
-            font-size: 18px;
+        .table-card-header h3 {
+            font-size: 1.125rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--primary-dark);
         }
 
-        .card-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .btn-sm:hover {
-            border-color: #667eea;
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .card-body {
-            padding: 28px;
-        }
-
-        /* Charts */
-        .chart-container {
+        .table-search {
             position: relative;
-            height: 300px;
-            margin-bottom: 24px;
         }
 
-        /* Table */
-        .table-container {
+        .table-search input {
+            padding: 0.625rem 2.5rem 0.625rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            width: 280px;
+        }
+
+        .table-search input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .table-wrapper {
             overflow-x: auto;
         }
 
@@ -419,840 +421,510 @@
         }
 
         thead {
-            background: #f8f9fa;
+            background: var(--bg-light);
         }
 
         th {
-            padding: 14px 16px;
+            padding: 1rem 1.5rem;
             text-align: left;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 700;
-            color: var(--gray);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        td {
-            padding: 16px;
-            font-size: 14px;
-            color: var(--dark);
-            border-bottom: 1px solid #f0f0f0;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
         }
 
         tbody tr {
-            transition: background 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
         }
 
         tbody tr:hover {
-            background: #f8f9fa;
+            background: var(--bg-light);
+        }
+
+        td {
+            padding: 1.25rem 1.5rem;
+            font-size: 0.875rem;
         }
 
         .badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
-        .badge-confirmed {
-            background: #fee;
-            color: #c33;
+        .badge.critical {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
         }
 
-        .badge-suspicious {
-            background: #fffbeb;
-            color: #f59e0b;
+        .badge.warning {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent-orange);
         }
 
-        .badge-active {
-            background: #d4edda;
-            color: #155724;
+        .badge.blocked {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
         }
 
-        .badge-inactive {
-            background: #f8d7da;
-            color: #721c24;
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray);
-        }
-
-        .spinner {
-            border: 3px solid #f0f0f0;
-            border-top: 3px solid #667eea;
+        .user-avatar {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            background: var(--accent-cyan);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .user-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray);
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
         }
 
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 20px;
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
             }
 
-            .navbar {
-                padding: 16px 20px;
+            .main-content {
+                margin-left: 220px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
             }
 
-            .stat-card {
-                padding: 20px;
-            }
-
-            .card-header {
+            .header-top {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
+                gap: 1rem;
             }
-        }
 
-        /* Filters */
-        .filters {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gray);
-        }
-
-        .filter-group select,
-        .filter-group input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s ease;
-        }
-
-        .filter-group select:focus,
-        .filter-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        /* Grid Layouts */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
+            .table-search input {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-box">
-            <div class="login-logo">
-                <h1>🛡️ IA Shield</h1>
-                <p>Company Dashboard</p>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="/" class="sidebar-logo-img">
+                    <img src="/icon_1_.png" alt="AI Shield">
+                    <span class="sidebar-logo-text">AI Shield</span>
+                </a>
             </div>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>API Key</label>
-                    <input 
-                        type="password" 
-                        id="apiKeyInput" 
-                        placeholder="sk_team_xxxxxxxxxx" 
-                        required
-                        autocomplete="off">
-                </div>
-                <button type="submit" class="btn">Access Dashboard</button>
-                <div class="error-message" id="loginError">Invalid API Key. Please check and try again.</div>
-            </form>
-        </div>
-    </div>
 
-    <!-- Dashboard -->
-    <div class="dashboard" id="dashboard">
-        <!-- Navbar -->
-        <nav class="navbar">
-            <div class="navbar-brand">
-                <div>
-                    <h1>🛡️ IA Shield</h1>
-                    <div class="navbar-company" id="companyName">Loading...</div>
+            <nav class="sidebar-nav">
+                <a href="/company-dashboard" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">📊</span>
+                    <span>Overview</span>
+                </a>
+                <a href="/detections" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🔍</span>
+                    <span>Detections</span>
+                </a>
+                <a href="/team" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    <span>Team</span>
+                </a>
+                <a href="/reports" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📈</span>
+                    <span>Reports</span>
+                </a>
+                <a href="/settings" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar">AC</div>
+                    <div class="sidebar-user-info">
+                        <h4>Acme Corp</h4>
+                        <p>Team Plan</p>
+                    </div>
                 </div>
             </div>
-            <div class="navbar-actions">
-                <button class="btn-logout" onclick="logout()">Logout</button>
-            </div>
-        </nav>
+        </aside>
 
         <!-- Main Content -->
-        <div class="main-content">
-            <div class="page-header">
-                <h2>Dashboard Overview</h2>
-                <p>Monitor your team's data protection activity</p>
-            </div>
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-top">
+                    <div>
+                        <h1>Company Dashboard</h1>
+                        <p>Monitor your team's AI usage and data protection in real-time</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary">
+                            📥 Export Report
+                        </button>
+                        <button class="btn btn-primary">
+                            ➕ Add Team Member
+                        </button>
+                    </div>
+                </div>
+            </header>
 
             <!-- Stats Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-label">Team Members</div>
-                            <div class="stat-value" id="totalUsers">-</div>
-                            <div class="stat-change" id="usersChange">Active users</div>
-                        </div>
-                        <div class="stat-icon">👥</div>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon blue">🛡️</div>
+                        <div class="stat-card-trend up">↑ 12%</div>
+                    </div>
+                    <div class="stat-card-label">Total Detections</div>
+                    <div class="stat-card-value">1,247</div>
+                    <div class="stat-card-footer">
+                        +142 from last month
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-label">Total Detections</div>
-                            <div class="stat-value" id="totalDetections">-</div>
-                            <div class="stat-change" id="detectionsChange">All time</div>
-                        </div>
-                        <div class="stat-icon">🔍</div>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon green">💰</div>
+                        <div class="stat-card-trend up">↑ 8%</div>
+                    </div>
+                    <div class="stat-card-label">Fines Prevented</div>
+                    <div class="stat-card-value">€623K</div>
+                    <div class="stat-card-footer">
+                        Based on €50K per incident
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-label">Confirmed</div>
-                            <div class="stat-value" id="confirmedCount">-</div>
-                            <div class="stat-change">High-risk data</div>
-                        </div>
-                        <div class="stat-icon">🔴</div>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon orange">⚠️</div>
+                        <div class="stat-card-trend down">↓ 5%</div>
+                    </div>
+                    <div class="stat-card-label">Critical Incidents</div>
+                    <div class="stat-card-value">23</div>
+                    <div class="stat-card-footer">
+                        -3 from last month
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-label">Suspicious</div>
-                            <div class="stat-value" id="suspiciousCount">-</div>
-                            <div class="stat-change">Medium-risk data</div>
-                        </div>
-                        <div class="stat-icon">⚠️</div>
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon blue">👥</div>
+                        <div class="stat-card-trend up">↑ 2</div>
+                    </div>
+                    <div class="stat-card-label">Active Users</div>
+                    <div class="stat-card-value">8/10</div>
+                    <div class="stat-card-footer">
+                        2 seats available
                     </div>
                 </div>
             </div>
 
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('overview')">📊 Overview</button>
-                <button class="tab" onclick="switchTab('team')">👥 Team</button>
-                <button class="tab" onclick="switchTab('detections')">🔍 Detections</button>
-            </div>
-
-            <!-- Tab: Overview -->
-            <div class="tab-content active" id="overviewTab">
-                <div class="grid-2">
-                    <!-- Detection Trends Chart -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Detection Trends</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="trendsChart"></canvas>
-                            </div>
-                        </div>
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3>Detections Over Time</h3>
+                        <p>Last 30 days</p>
                     </div>
-
-                    <!-- Detection Types Chart -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Detection Types</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="typesChart"></canvas>
-                            </div>
-                        </div>
+                    <div class="chart-container">
+                        <canvas id="detectionsTrendChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Recent Activity</h3>
-                        <div class="card-actions">
-                            <button class="btn-sm" onclick="loadRecentDetections()">🔄 Refresh</button>
-                        </div>
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3>Data Types</h3>
+                        <p>Distribution by type</p>
                     </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Type</th>
-                                        <th>Confidence</th>
-                                        <th>User</th>
-                                        <th>Platform</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recentDetectionsBody">
-                                    <tr>
-                                        <td colspan="5">
-                                            <div class="loading">
-                                                <div class="spinner"></div>
-                                                Loading recent activity...
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="chart-container">
+                        <canvas id="dataTypesChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab: Team -->
-            <div class="tab-content" id="teamTab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Team Members</h3>
-                        <div class="card-actions">
-                            <button class="btn-sm" onclick="loadTeam()">🔄 Refresh</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                        <th>Last Activity</th>
-                                        <th>Detections</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="teamTableBody">
-                                    <tr>
-                                        <td colspan="5">
-                                            <div class="loading">
-                                                <div class="spinner"></div>
-                                                Loading team members...
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            <!-- Detections Table -->
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h3>Recent Detections</h3>
+                    <div class="table-search">
+                        <input type="text" placeholder="Search detections...">
                     </div>
                 </div>
-            </div>
-
-            <!-- Tab: Detections -->
-            <div class="tab-content" id="detectionsTab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">All Detections</h3>
-                        <div class="card-actions">
-                            <button class="btn-sm" onclick="loadAllDetections()">🔄 Refresh</button>
-                            <button class="btn-sm" onclick="exportDetections()">📥 Export CSV</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Filters -->
-                        <div class="filters">
-                            <div class="filter-group">
-                                <label>Confidence Level</label>
-                                <select id="confidenceFilter" onchange="filterDetections()">
-                                    <option value="">All Levels</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="suspicious">Suspicious</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Detection Type</label>
-                                <select id="typeFilter" onchange="filterDetections()">
-                                    <option value="">All Types</option>
-                                    <option value="CPF">CPF</option>
-                                    <option value="EMAIL">Email</option>
-                                    <option value="PHONE">Phone</option>
-                                    <option value="CREDIT_CARD">Credit Card</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Date From</label>
-                                <input type="date" id="dateFromFilter" onchange="filterDetections()">
-                            </div>
-                            <div class="filter-group">
-                                <label>Date To</label>
-                                <input type="date" id="dateToFilter" onchange="filterDetections()">
-                            </div>
-                        </div>
-
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Type</th>
-                                        <th>Confidence</th>
-                                        <th>Value (Masked)</th>
-                                        <th>User</th>
-                                        <th>Platform</th>
-                                        <th>Timestamp</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detectionsTableBody">
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="loading">
-                                                <div class="spinner"></div>
-                                                Loading detections...
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Data Type</th>
+                                <th>AI Platform</th>
+                                <th>Severity</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detectionsTable">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        const BACKEND_URL = 'https://ai-shield-backend-production.up.railway.app';
-        let apiKey = '';
-        let companyData = null;
-        let allDetections = [];
-        let allUsers = [];
-        
-        // Charts
-        let trendsChart = null;
-        let typesChart = null;
+        // ==========================================
+        // MOCK DATA
+        // ==========================================
+        const mockDetections = [
+            {
+                user: { name: 'João Silva', email: 'joao@acme.com', initials: 'JS' },
+                dataType: 'CPF',
+                platform: 'ChatGPT',
+                severity: 'critical',
+                date: '2026-03-15 14:32',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Maria Santos', email: 'maria@acme.com', initials: 'MS' },
+                dataType: 'IBAN',
+                platform: 'Claude',
+                severity: 'critical',
+                date: '2026-03-15 13:45',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Pedro Costa', email: 'pedro@acme.com', initials: 'PC' },
+                dataType: 'Email',
+                platform: 'Gemini',
+                severity: 'warning',
+                date: '2026-03-15 12:18',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Ana Oliveira', email: 'ana@acme.com', initials: 'AO' },
+                dataType: 'Credit Card',
+                platform: 'ChatGPT',
+                severity: 'critical',
+                date: '2026-03-15 11:05',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Carlos Mendes', email: 'carlos@acme.com', initials: 'CM' },
+                dataType: 'Phone Number',
+                platform: 'Copilot',
+                severity: 'warning',
+                date: '2026-03-15 10:22',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Sofia Alves', email: 'sofia@acme.com', initials: 'SA' },
+                dataType: 'CNPJ',
+                platform: 'ChatGPT',
+                severity: 'critical',
+                date: '2026-03-15 09:47',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Miguel Rodrigues', email: 'miguel@acme.com', initials: 'MR' },
+                dataType: 'API Key',
+                platform: 'Claude',
+                severity: 'critical',
+                date: '2026-03-14 16:55',
+                status: 'Blocked'
+            },
+            {
+                user: { name: 'Beatriz Lima', email: 'beatriz@acme.com', initials: 'BL' },
+                dataType: 'NIF',
+                platform: 'Gemini',
+                severity: 'warning',
+                date: '2026-03-14 15:30',
+                status: 'Blocked'
+            }
+        ];
 
-        // Login
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const key = document.getElementById('apiKeyInput').value.trim();
-            
-            try {
-                // Test API Key by fetching users (guaranteed to work)
-                const response = await fetch(`${BACKEND_URL}/api/users`, {
-                    headers: { 'x-api-key': key }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        apiKey = key;
-                        
-                        // Store company data if available
-                        companyData = {
-                            name: 'Your Company', // Default
-                            max_users: data.max_users || 10
-                        };
-                        
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('dashboard').classList.add('show');
-                        await loadDashboard();
-                    } else {
-                        showLoginError();
-                    }
-                } else {
-                    showLoginError();
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showLoginError('Error connecting to server');
-            }
-        });
-
-        function showLoginError(message = 'Invalid API Key. Please check and try again.') {
-            const errorEl = document.getElementById('loginError');
-            errorEl.textContent = message;
-            errorEl.classList.add('show');
-        }
-
-        function logout() {
-            apiKey = '';
-            companyData = null;
-            document.getElementById('dashboard').classList.remove('show');
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('apiKeyInput').value = '';
-            document.getElementById('loginError').classList.remove('show');
-        }
-
-        // Load Dashboard
-        async function loadDashboard() {
-            try {
-                // Load data first
-                await loadTeam();
-                await loadAllDetections();
-                
-                // Calculate stats from loaded data
-                calculateStats();
-                
-                // Load recent for display
-                await loadRecentDetections();
-                
-                // Initialize charts after data loads
-                setTimeout(() => {
-                    initCharts();
-                }, 500);
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-            }
-        }
-
-        // Calculate Stats from loaded data
-        function calculateStats() {
-            try {
-                // Count active users
-                const activeUsers = allUsers.filter(u => u.is_active).length;
-                
-                // Count detections by type
-                const totalDetections = allDetections.length;
-                const confirmedCount = allDetections.filter(d => d.confidence_level === 'confirmed').length;
-                const suspiciousCount = allDetections.filter(d => d.confidence_level === 'suspicious').length;
-                
-                // Update UI
-                document.getElementById('totalUsers').textContent = activeUsers;
-                document.getElementById('totalDetections').textContent = totalDetections;
-                document.getElementById('confirmedCount').textContent = confirmedCount;
-                document.getElementById('suspiciousCount').textContent = suspiciousCount;
-                
-                // Set company name
-                const companyName = companyData?.name || 'Your Company';
-                document.getElementById('companyName').textContent = companyName;
-            } catch (error) {
-                console.error('Error calculating stats:', error);
-                // Set defaults on error
-                document.getElementById('totalUsers').textContent = '0';
-                document.getElementById('totalDetections').textContent = '0';
-                document.getElementById('confirmedCount').textContent = '0';
-                document.getElementById('suspiciousCount').textContent = '0';
-                document.getElementById('companyName').textContent = 'Your Company';
-            }
-        }
-
-        // Load Team
-        async function loadTeam() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/users`, {
-                    headers: { 'x-api-key': apiKey }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    allUsers = data.users || [];
-                    const tbody = document.getElementById('teamTableBody');
-                    
-                    if (allUsers.length === 0) {
-                        tbody.innerHTML = `
-                            <tr>
-                                <td colspan="5">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon">👥</div>
-                                        <p>No team members yet</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                        return;
-                    }
-                    
-                    tbody.innerHTML = allUsers.map(user => `
-                        <tr>
-                            <td><strong>${user.user_name || 'N/A'}</strong></td>
-                            <td>${user.user_email}</td>
-                            <td>
-                                <span class="badge ${user.is_active ? 'badge-active' : 'badge-inactive'}">
-                                    ${user.is_active ? 'Active' : 'Inactive'}
-                                </span>
-                            </td>
-                            <td>${user.last_activity ? new Date(user.last_activity).toLocaleString() : 'Never'}</td>
-                            <td>-</td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error loading team:', error);
-            }
-        }
-
-        // Load Recent Detections
-        async function loadRecentDetections() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/detections?limit=10`, {
-                    headers: { 'x-api-key': apiKey }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    const detections = data.detections || [];
-                    const tbody = document.getElementById('recentDetectionsBody');
-                    
-                    if (detections.length === 0) {
-                        tbody.innerHTML = `
-                            <tr>
-                                <td colspan="5">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon">🔍</div>
-                                        <p>No detections yet</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                        return;
-                    }
-                    
-                    tbody.innerHTML = detections.map(d => `
-                        <tr>
-                            <td><strong>${d.detection_type}</strong></td>
-                            <td>
-                                <span class="badge ${d.confidence_level === 'confirmed' ? 'badge-confirmed' : 'badge-suspicious'}">
-                                    ${d.confidence_level}
-                                </span>
-                            </td>
-                            <td>${d.user_name || d.user_email}</td>
-                            <td>${d.ai_platform || 'N/A'}</td>
-                            <td>${new Date(d.timestamp).toLocaleString()}</td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error loading recent detections:', error);
-            }
-        }
-
-        // Load All Detections
-        async function loadAllDetections() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/detections?limit=100`, {
-                    headers: { 'x-api-key': apiKey }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    allDetections = data.detections || [];
-                    filterDetections();
-                }
-            } catch (error) {
-                console.error('Error loading all detections:', error);
-            }
-        }
-
-        // Filter Detections
-        function filterDetections() {
-            const confidence = document.getElementById('confidenceFilter').value;
-            const type = document.getElementById('typeFilter').value;
-            const dateFrom = document.getElementById('dateFromFilter').value;
-            const dateTo = document.getElementById('dateToFilter').value;
-            
-            let filtered = [...allDetections];
-            
-            if (confidence) {
-                filtered = filtered.filter(d => d.confidence_level === confidence);
-            }
-            
-            if (type) {
-                filtered = filtered.filter(d => d.detection_type === type);
-            }
-            
-            if (dateFrom) {
-                filtered = filtered.filter(d => new Date(d.timestamp) >= new Date(dateFrom));
-            }
-            
-            if (dateTo) {
-                const endDate = new Date(dateTo);
-                endDate.setHours(23, 59, 59);
-                filtered = filtered.filter(d => new Date(d.timestamp) <= endDate);
-            }
-            
-            const tbody = document.getElementById('detectionsTableBody');
-            
-            if (filtered.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🔍</div>
-                                <p>No detections match your filters</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tbody.innerHTML = filtered.map(d => `
+        // ==========================================
+        // POPULATE TABLE
+        // ==========================================
+        function populateTable() {
+            const tbody = document.getElementById('detectionsTable');
+            tbody.innerHTML = mockDetections.map(detection => `
                 <tr>
-                    <td><strong>${d.detection_type}</strong></td>
                     <td>
-                        <span class="badge ${d.confidence_level === 'confirmed' ? 'badge-confirmed' : 'badge-suspicious'}">
-                            ${d.confidence_level}
-                        </span>
+                        <div class="user-cell">
+                            <div class="user-avatar">${detection.user.initials}</div>
+                            <div class="user-info">
+                                <h4>${detection.user.name}</h4>
+                                <p>${detection.user.email}</p>
+                            </div>
+                        </div>
                     </td>
-                    <td><code>${d.detected_value_masked || 'N/A'}</code></td>
-                    <td>${d.user_name || d.user_email}</td>
-                    <td>${d.ai_platform || 'N/A'}</td>
-                    <td>${new Date(d.timestamp).toLocaleString()}</td>
+                    <td><strong>${detection.dataType}</strong></td>
+                    <td>${detection.platform}</td>
+                    <td><span class="badge ${detection.severity}">${detection.severity}</span></td>
+                    <td>${detection.date}</td>
+                    <td><span class="badge blocked">${detection.status}</span></td>
                 </tr>
             `).join('');
         }
 
-        // Export Detections
-        function exportDetections() {
-            if (allDetections.length === 0) {
-                alert('No detections to export');
-                return;
-            }
-            
-            const csv = [
-                ['Type', 'Confidence', 'Value', 'User', 'Platform', 'Timestamp'],
-                ...allDetections.map(d => [
-                    d.detection_type,
-                    d.confidence_level,
-                    d.detected_value_masked,
-                    d.user_email,
-                    d.ai_platform,
-                    new Date(d.timestamp).toISOString()
-                ])
-            ].map(row => row.join(',')).join('\n');
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ia-shield-detections-${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // Switch Tabs
-        function switchTab(tabName) {
-            // Remove active from all tabs
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Add active to selected
-            event.target.classList.add('active');
-            document.getElementById(tabName + 'Tab').classList.add('active');
-        }
-
-        // Initialize Charts
-        function initCharts() {
-            // Check if Chart.js loaded
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded');
-                return;
-            }
-            
-            // Prepare data
-            const detectionsByType = {};
-            allDetections.forEach(d => {
-                detectionsByType[d.detection_type] = (detectionsByType[d.detection_type] || 0) + 1;
-            });
-            
-            // Trends Chart (placeholder - would need time-series data)
-            const ctx1 = document.getElementById('trendsChart');
-            if (ctx1) {
-                trendsChart = new Chart(ctx1, {
-                    type: 'line',
-                    data: {
-                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                        datasets: [{
-                            label: 'Detections',
-                            data: [12, 19, 15, 25],
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4
-                        }]
+        // ==========================================
+        // CHARTS
+        // ==========================================
+        
+        // Detections Trend Chart (Line)
+        const detectionsTrendCtx = document.getElementById('detectionsTrendChart').getContext('2d');
+        new Chart(detectionsTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mar 1', 'Mar 3', 'Mar 5', 'Mar 7', 'Mar 9', 'Mar 11', 'Mar 13', 'Mar 15'],
+                datasets: [{
+                    label: 'Detections',
+                    data: [35, 42, 38, 55, 48, 62, 58, 71],
+                    borderColor: '#00a8e8',
+                    backgroundColor: 'rgba(0, 168, 232, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#00a8e8',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
-                });
+                }
             }
-            
-            // Types Chart
-            const ctx2 = document.getElementById('typesChart');
-            if (ctx2) {
-                typesChart = new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(detectionsByType),
-                        datasets: [{
-                            data: Object.values(detectionsByType),
-                            backgroundColor: [
-                                '#667eea',
-                                '#764ba2',
-                                '#f093fb',
-                                '#4facfe',
-                                '#43e97b'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
+        });
+
+        // Data Types Chart (Doughnut)
+        const dataTypesCtx = document.getElementById('dataTypesChart').getContext('2d');
+        new Chart(dataTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['CPF/CNPJ', 'Credit Card', 'IBAN', 'Email', 'API Keys', 'Other'],
+                datasets: [{
+                    data: [380, 245, 189, 156, 98, 179],
+                    backgroundColor: [
+                        '#00a8e8',
+                        '#1e5ba8',
+                        '#22c55e',
+                        '#ff6b35',
+                        '#ef4444',
+                        '#64748b'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12
                             }
                         }
                     }
-                });
+                }
+            }
+        });
+
+        // ==========================================
+        // INITIALIZE
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTable();
+        });
+
+        // ==========================================
+        // TODO: BACKEND INTEGRATION
+        // ==========================================
+        /*
+        async function loadRealData() {
+            try {
+                // Get company ID from session/URL
+                const companyId = 'YOUR_COMPANY_ID';
+                
+                // Fetch stats
+                const statsRes = await fetch(`/api/company/${companyId}/stats`);
+                const stats = await statsRes.json();
+                
+                // Fetch detections
+                const detectionsRes = await fetch(`/api/company/${companyId}/detections`);
+                const detections = await detectionsRes.json();
+                
+                // Update UI
+                updateStats(stats);
+                updateTable(detections);
+                updateCharts(detections);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
             }
         }
+        */
     </script>
 </body>
 </html>
