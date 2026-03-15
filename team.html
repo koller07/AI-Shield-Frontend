@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - AI Shield Dashboard</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary-dark: #002d5c;
+            --primary-blue: #1e5ba8;
+            --accent-cyan: #00a8e8;
+            --accent-green: #22c55e;
+            --accent-orange: #ff6b35;
+            --accent-red: #ef4444;
+            --text-primary: #1a1a2e;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .dashboard-layout { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo-img {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .sidebar-logo-img img { width: 36px; height: 36px; }
+        .sidebar-logo-text { font-size: 1.25rem; font-weight: 800; }
+        .sidebar-nav { padding: 0 1rem; }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-nav-item.active { background: var(--accent-cyan); color: white; }
+        .sidebar-nav-icon { font-size: 1.25rem; }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .sidebar-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .sidebar-user-info h4 { font-size: 0.875rem; font-weight: 600; }
+        .sidebar-user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+        /* Main Content */
+        .main-content { flex: 1; margin-left: 260px; padding: 2rem; }
+
+        .header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p { color: var(--text-secondary); }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-primary:hover { background: #16a34a; }
+
+        /* Team Stats */
+        .team-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+        }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-member-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            transition: all 0.3s;
+        }
+
+        .team-member-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .team-member-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .team-member-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .team-member-info h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .team-member-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .team-member-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .member-stat {
+            text-align: center;
+        }
+
+        .member-stat-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .member-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .team-member-actions {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+            flex: 1;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 220px; }
+            .main-content { margin-left: 220px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 1.5rem; }
+            .team-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="/" class="sidebar-logo-img">
+                    <img src="/icon_1_.png" alt="AI Shield">
+                    <span class="sidebar-logo-text">AI Shield</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/company-dashboard" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    <span>Overview</span>
+                </a>
+                <a href="/detections" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🔍</span>
+                    <span>Detections</span>
+                </a>
+                <a href="/team" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">👥</span>
+                    <span>Team</span>
+                </a>
+                <a href="/reports" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📈</span>
+                    <span>Reports</span>
+                </a>
+                <a href="/settings" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar">AC</div>
+                    <div class="sidebar-user-info">
+                        <h4>Acme Corp</h4>
+                        <p>Team Plan</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1>Team Members</h1>
+                    <p>Manage your team and monitor individual usage</p>
+                </div>
+                <button class="btn btn-primary" onclick="alert('Add team member feature coming soon!')">
+                    ➕ Add Member
+                </button>
+            </header>
+
+            <!-- Team Stats -->
+            <div class="team-stats">
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Members</div>
+                    <div class="stat-card-value">8</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Active This Month</div>
+                    <div class="stat-card-value">8</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Available Seats</div>
+                    <div class="stat-card-value">2/10</div>
+                </div>
+            </div>
+
+            <!-- Team Members Grid -->
+            <div class="team-grid" id="teamGrid">
+                <!-- Populated by JS -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const teamMembers = [
+            { name: 'João Silva', email: 'joao@acme.com', initials: 'JS', detections: 156, critical: 12, lastActive: '2h ago', status: 'active' },
+            { name: 'Maria Santos', email: 'maria@acme.com', initials: 'MS', detections: 142, critical: 8, lastActive: '5h ago', status: 'active' },
+            { name: 'Pedro Costa', email: 'pedro@acme.com', initials: 'PC', detections: 98, critical: 5, lastActive: '1d ago', status: 'active' },
+            { name: 'Ana Oliveira', email: 'ana@acme.com', initials: 'AO', detections: 134, critical: 15, lastActive: '3h ago', status: 'active' },
+            { name: 'Carlos Mendes', email: 'carlos@acme.com', initials: 'CM', detections: 87, critical: 4, lastActive: '6h ago', status: 'active' },
+            { name: 'Sofia Alves', email: 'sofia@acme.com', initials: 'SA', detections: 201, critical: 22, lastActive: '1h ago', status: 'active' },
+            { name: 'Miguel Rodrigues', email: 'miguel@acme.com', initials: 'MR', detections: 76, critical: 3, lastActive: '2d ago', status: 'active' },
+            { name: 'Beatriz Lima', email: 'beatriz@acme.com', initials: 'BL', detections: 112, critical: 7, lastActive: '4h ago', status: 'active' }
+        ];
+
+        function populateTeam() {
+            const grid = document.getElementById('teamGrid');
+            grid.innerHTML = teamMembers.map(member => `
+                <div class="team-member-card">
+                    <div class="team-member-header">
+                        <div class="team-member-avatar">${member.initials}</div>
+                        <div class="team-member-info">
+                            <h3>${member.name}</h3>
+                            <p>${member.email}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="team-member-stats">
+                        <div class="member-stat">
+                            <div class="member-stat-value">${member.detections}</div>
+                            <div class="member-stat-label">Detections</div>
+                        </div>
+                        <div class="member-stat">
+                            <div class="member-stat-value">${member.critical}</div>
+                            <div class="member-stat-label">Critical</div>
+                        </div>
+                        <div class="member-stat">
+                            <div class="member-stat-value">${member.lastActive}</div>
+                            <div class="member-stat-label">Last Active</div>
+                        </div>
+                    </div>
+
+                    <div class="team-member-actions">
+                        <button class="btn btn-secondary btn-small">View Details</button>
+                        <button class="btn btn-secondary btn-small">Activity</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTeam();
+        });
+    </script>
+</body>
+</html>
