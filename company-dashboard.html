@@ -467,11 +467,6 @@
             color: var(--accent-orange);
         }
 
-        .badge.blocked {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent-green);
-        }
-
         .user-cell {
             display: flex;
             align-items: center;
@@ -693,16 +688,7 @@
                 </div>
                 <div class="table-wrapper">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Data Type</th>
-                                <th>AI Platform</th>
-                                <th>Severity</th>
-                                <th>Date & Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+
                         <tbody id="detectionsTable">
                             <!-- Data will be populated by JavaScript -->
                         </tbody>
@@ -722,64 +708,56 @@
                 dataType: 'CPF',
                 platform: 'ChatGPT',
                 severity: 'critical',
-                date: '2026-03-15 14:32',
-                status: 'Blocked'
+                date: '2026-03-15 14:32'
             },
             {
                 user: { name: 'Maria Santos', email: 'maria@acme.com', initials: 'MS' },
                 dataType: 'IBAN',
                 platform: 'Claude',
                 severity: 'critical',
-                date: '2026-03-15 13:45',
-                status: 'Blocked'
+                date: '2026-03-15 13:45'
             },
             {
                 user: { name: 'Pedro Costa', email: 'pedro@acme.com', initials: 'PC' },
                 dataType: 'Email',
                 platform: 'Gemini',
                 severity: 'warning',
-                date: '2026-03-15 12:18',
-                status: 'Blocked'
+                date: '2026-03-15 12:18'
             },
             {
                 user: { name: 'Ana Oliveira', email: 'ana@acme.com', initials: 'AO' },
                 dataType: 'Credit Card',
                 platform: 'ChatGPT',
                 severity: 'critical',
-                date: '2026-03-15 11:05',
-                status: 'Blocked'
+                date: '2026-03-15 11:05'
             },
             {
                 user: { name: 'Carlos Mendes', email: 'carlos@acme.com', initials: 'CM' },
                 dataType: 'Phone Number',
                 platform: 'Copilot',
                 severity: 'warning',
-                date: '2026-03-15 10:22',
-                status: 'Blocked'
+                date: '2026-03-15 10:22'
             },
             {
                 user: { name: 'Sofia Alves', email: 'sofia@acme.com', initials: 'SA' },
                 dataType: 'CNPJ',
                 platform: 'ChatGPT',
                 severity: 'critical',
-                date: '2026-03-15 09:47',
-                status: 'Blocked'
+                date: '2026-03-15 09:47'
             },
             {
                 user: { name: 'Miguel Rodrigues', email: 'miguel@acme.com', initials: 'MR' },
                 dataType: 'API Key',
                 platform: 'Claude',
                 severity: 'critical',
-                date: '2026-03-14 16:55',
-                status: 'Blocked'
+                date: '2026-03-14 16:55'
             },
             {
                 user: { name: 'Beatriz Lima', email: 'beatriz@acme.com', initials: 'BL' },
                 dataType: 'NIF',
                 platform: 'Gemini',
                 severity: 'warning',
-                date: '2026-03-14 15:30',
-                status: 'Blocked'
+                date: '2026-03-14 15:30'
             }
         ];
 
@@ -803,7 +781,6 @@
                     <td>${detection.platform}</td>
                     <td><span class="badge ${detection.severity}">${detection.severity}</span></td>
                     <td>${detection.date}</td>
-                    <td><span class="badge blocked">${detection.status}</span></td>
                 </tr>
             `).join('');
         }
