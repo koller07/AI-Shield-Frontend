@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,7 @@
         }
 
         :root {
-            /* AI Shield Brand Colors */
+            /* AI Shield Brand Colours */
             --primary-dark: #002d5c;
             --primary-blue: #1e5ba8;
             --accent-cyan: #00a8e8;
@@ -549,10 +549,10 @@
 
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2.5rem;
             margin-top: 4rem;
-            max-width: 1200px;
+            max-width: 1400px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -659,6 +659,9 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+            text-decoration: none;
+            display: block;
+            text-align: center;
         }
 
         .plan-cta:hover {
@@ -1053,7 +1056,7 @@
                 <a href="#features">Features</a>
                 <a href="#pricing">Pricing</a>
                 <a href="#faq">FAQ</a>
-                <a href="/company-dashboard" class="btn-login">Login</a>
+                <a href="/login" class="btn-login">Login</a>
                 <a href="javascript:void(0)" class="btn-demo" onclick="openDemoPopup()">Book a Demo</a>
             </div>
         </div>
@@ -1074,7 +1077,7 @@
                     AI Shield monitors ChatGPT, Claude, and 25+ AI platforms in real-time—blocking sensitive data before it's sent and preventing costly compliance violations.
                 </p>
                 <div class="hero-ctas">
-                    <a href="#pricing" class="btn-primary">
+                    <a href="/signup?plan=professional" class="btn-primary">
                         Start 14-Day Free Trial →
                     </a>
                     <button class="btn-secondary" onclick="openDemoPopup()">
@@ -1200,47 +1203,70 @@
                 </p>
             </div>
             <div class="pricing-grid">
+                <!-- STARTER PLAN -->
                 <div class="pricing-card">
-                    <div class="plan-name">Solo</div>
-                    <div class="plan-price">€9<span>/month</span></div>
-                    <p class="plan-description">For individual professionals</p>
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">€29<span>/month</span></div>
+                    <p class="plan-description">For small teams</p>
                     <ul class="plan-features">
-                        <li>1 user</li>
-                        <li>Real-time AI monitoring</li>
+                        <li>1-3 users</li>
                         <li>25+ data types detected</li>
-                        <li>All AI platforms</li>
+                        <li>Real-time alerts</li>
+                        <li>Basic dashboard</li>
                         <li>Monthly reports</li>
                         <li>Email support</li>
                     </ul>
-                    <button class="plan-cta">Start Free Trial</button>
+                    <a href="/signup?plan=starter" class="plan-cta">Start Free Trial</a>
                 </div>
 
+                <!-- PROFESSIONAL PLAN (FEATURED) -->
                 <div class="pricing-card featured">
-                    <div class="plan-name">Team</div>
-                    <div class="plan-price">€39<span>/month</span></div>
+                    <div class="plan-name">Professional</div>
+                    <div class="plan-price">€49<span>/month</span></div>
                     <p class="plan-description">For growing teams</p>
                     <ul class="plan-features">
-                        <li>Up to 10 users</li>
-                        <li>Everything in Solo</li>
-                        <li>Admin dashboard</li>
-                        <li>Team analytics & reports</li>
+                        <li>Everything in Starter +</li>
+                        <li>5-25 users</li>
+                        <li>Advanced analytics</li>
+                        <li>Customisable policies</li>
+                        <li>Slack/Teams integrations</li>
                         <li>Priority support</li>
-                        <li>Custom detection policies</li>
+                        <li>99.9% SLA</li>
                     </ul>
-                    <button class="plan-cta">Start Free Trial</button>
+                    <a href="/signup?plan=professional" class="plan-cta">Start Free Trial</a>
                 </div>
 
+                <!-- BUSINESS PLAN -->
+                <div class="pricing-card">
+                    <div class="plan-name">Business</div>
+                    <div class="plan-price">€149<span>/month</span></div>
+                    <p class="plan-description">For established organisations</p>
+                    <ul class="plan-features">
+                        <li>Everything in Professional +</li>
+                        <li>10-50 users</li>
+                        <li>SSO/SAML integration</li>
+                        <li>Full API access</li>
+                        <li>White label option</li>
+                        <li>Dedicated account manager</li>
+                        <li>24/7 support</li>
+                        <li>99.99% SLA</li>
+                    </ul>
+                    <a href="/signup?plan=business" class="plan-cta">Contact Sales</a>
+                </div>
+
+                <!-- ENTERPRISE PLAN -->
                 <div class="pricing-card">
                     <div class="plan-name">Enterprise</div>
                     <div class="plan-price">Custom</div>
-                    <p class="plan-description">For large organizations</p>
+                    <p class="plan-description">Tailored solutions</p>
                     <ul class="plan-features">
-                        <li>Unlimited users</li>
-                        <li>Everything in Team</li>
-                        <li>SSO integration (SAML)</li>
-                        <li>White label options</li>
-                        <li>Dedicated support</li>
-                        <li>SLA guarantee</li>
+                        <li>Everything in Business +</li>
+                        <li>Unlimited users (50+)</li>
+                        <li>On-premise deployment</li>
+                        <li>Custom ML models</li>
+                        <li>Dedicated infrastructure</li>
+                        <li>Custom SLA up to 99.999%</li>
+                        <li>Dedicated success team</li>
                     </ul>
                     <button class="plan-cta secondary" onclick="openEnterprisePopup()">Contact Sales</button>
                 </div>
@@ -1312,7 +1338,7 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>Solo plan: €9/month for 1 user. Team plan: €39/month for up to 10 users. Enterprise: Custom pricing for unlimited users with SSO, white label, and SLA. All plans include a 14-day free trial with no credit card required.</p>
+                        <p>Starter plan: €29/month for 1-3 users. Professional plan: €49/month for 5-25 users. Business plan: €149/month for 10-50 users. Enterprise: Custom pricing for unlimited users with SSO, white label, and SLA. All plans include a 14-day free trial with no credit card required.</p>
                     </div>
                 </div>
 
@@ -1344,7 +1370,7 @@
         <div class="final-cta-content">
             <h2>Start Protecting Your Data Today</h2>
             <p>Join hundreds of European companies preventing GDPR fines and building AI trust with their teams. 14-day free trial, no credit card required.</p>
-            <a href="#pricing" class="btn-primary">Start Free Trial →</a>
+            <a href="/signup?plan=professional" class="btn-primary">Start Free Trial →</a>
         </div>
     </section>
 
@@ -1353,7 +1379,7 @@
         <div class="popup-content">
             <button class="popup-close" onclick="closeDemoPopup()">×</button>
             <h3>Schedule Your Demo</h3>
-            <p>See AI Shield in action. Choose your preferred date and time for a personalized demo.</p>
+            <p>See AI Shield in action. Choose your preferred date and time for a personalised demo.</p>
             <form class="contact-form" onsubmit="submitDemo(event)">
                 <input type="text" id="demoName" placeholder="Full Name *" required>
                 <input type="email" id="demoEmail" placeholder="Work Email *" required>
@@ -1385,10 +1411,10 @@
                 <input type="text" placeholder="Company Name *" required>
                 <select required>
                     <option value="">Company Size *</option>
-                    <option value="micro">1-10 employees (Micro)</option>
-                    <option value="small">11-50 employees (Small)</option>
-                    <option value="medium">51-250 employees (Medium)</option>
-                    <option value="large">250+ employees (Large)</option>
+                    <option value="1-10">1-10 employees</option>
+                    <option value="11-50">11-50 employees</option>
+                    <option value="51-250">51-250 employees</option>
+                    <option value="250+">250+ employees</option>
                 </select>
                 <input type="tel" placeholder="Phone Number (Optional)">
                 <button type="submit">Request Enterprise Demo</button>
@@ -1418,13 +1444,12 @@
             const dateInput = document.getElementById('demoDate');
             if (dateInput) {
                 const today = new Date();
-                today.setDate(today.getDate() + 2); // Add 2 days
+                today.setDate(today.getDate() + 2);
                 const minDate = today.toISOString().split('T')[0];
                 dateInput.setAttribute('min', minDate);
             }
         }
 
-        // Call on page load
         setMinimumDemoDate();
 
         // FAQ Toggle
@@ -1433,7 +1458,6 @@
             const answer = button.nextElementSibling;
             const icon = button.querySelector('.faq-icon');
             
-            // Close other FAQs
             document.querySelectorAll('.faq-item').forEach(faq => {
                 if (faq !== item) {
                     faq.classList.remove('active');
@@ -1442,7 +1466,6 @@
                 }
             });
             
-            // Toggle current
             item.classList.toggle('active');
             answer.classList.toggle('active');
             icon.textContent = item.classList.contains('active') ? '×' : '+';
@@ -1452,7 +1475,7 @@
         function openDemoPopup() {
             document.getElementById('demoPopup').classList.add('active');
             document.body.style.overflow = 'hidden';
-            setMinimumDemoDate(); // Ensure date is set
+            setMinimumDemoDate();
         }
 
         function closeDemoPopup() {
@@ -1474,22 +1497,9 @@
             
             console.log('Demo Booking:', formData);
             
-            // TODO: Integrate with backend
-            try {
-                // Uncomment when backend is ready:
-                // const response = await fetch('/api/book-demo', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(formData)
-                // });
-                
-                alert(`Thank you! Your demo is scheduled for ${formData.date} at ${formData.time}. We'll send you a calendar invite shortly.`);
-                closeDemoPopup();
-                e.target.reset();
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error booking demo. Please try again or email us directly.');
-            }
+            alert(`Thank you! Your demo is scheduled for ${formData.date} at ${formData.time}. We'll send you a calendar invite shortly.`);
+            closeDemoPopup();
+            e.target.reset();
         }
 
         // Enterprise Popup
@@ -1517,22 +1527,9 @@
             
             console.log('Enterprise Lead:', formData);
             
-            // TODO: Integrate with backend
-            try {
-                // Uncomment when backend is ready:
-                // const response = await fetch('/api/enterprise-leads', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(formData)
-                // });
-                
-                alert('Thank you! Our enterprise team will contact you within 24 hours.');
-                closeEnterprisePopup();
-                e.target.reset();
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error submitting form. Please try again.');
-            }
+            alert('Thank you! Our enterprise team will contact you within 24 hours.');
+            closeEnterprisePopup();
+            e.target.reset();
         }
 
         // Close popups on outside click
@@ -1558,7 +1555,7 @@
             });
         });
 
-        // Add scroll animation for sections
+        // Scroll animation
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
