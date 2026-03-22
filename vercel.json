@@ -1,32 +1,13 @@
 {
   "rewrites": [
-    {
-      "source": "/dashboard",
-      "destination": "/admin-dashboard.html"
-    },
-    {
-      "source": "/company-dashboard",
-      "destination": "/company-dashboard.html"
-    },
-    {
-      "source": "/detections",
-      "destination": "/detections.html"
-    },
-    {
-      "source": "/team",
-      "destination": "/team.html"
-    },
-    {
-      "source": "/reports",
-      "destination": "/reports.html"
-    },
-    {
-      "source": "/settings",
-      "destination": "/settings.html"
-    },
-    {
-      "source": "/success",
-      "destination": "/success.html"
-    }
-  ]
+    { "source": "/signup", "destination": "/signup.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/company-dashboard", "destination": "/company-dashboard.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/gdpr", "destination": "/gdpr.html" },
+    { "source": "/security", "destination": "/security.html" },
+    { "source": "/contact", "destination": "/contact.html" }
+  ],
+  "cleanUrls": true
 }
