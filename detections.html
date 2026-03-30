@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detections - AI Shield Dashboard</title>
+    <title>Detections - AI Shield</title>
+    <link rel="icon" type="image/png" href="/icon_1_.png">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary-dark: #002d5c;
@@ -24,38 +21,44 @@
             --bg-light: #f8fafc;
             --bg-white: #ffffff;
             --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
             background: var(--bg-light);
             color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
         }
 
         .dashboard-layout { display: flex; min-height: 100vh; }
 
-        /* Sidebar - Same as Overview */
+        /* Sidebar Retrátil - Igual Overview */
         .sidebar {
             width: 260px;
             background: var(--primary-dark);
             color: white;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .sidebar-logo-text,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .sidebar-user-info { display: none; }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1.5rem;
         }
 
         .sidebar-logo {
-            padding: 0 1.5rem 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-logo-img {
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -63,11 +66,20 @@
             color: white;
         }
 
-        .sidebar-logo-img img { width: 36px; height: 36px; }
+        .sidebar-logo img { width: 36px; height: 36px; min-width: 36px; }
+        .sidebar-logo-text { font-size: 1.25rem; font-weight: 800; white-space: nowrap; }
 
-        .sidebar-logo-text {
-            font-size: 1.25rem;
-            font-weight: 800;
+        .toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .sidebar-nav { padding: 0 1rem; }
@@ -84,21 +96,12 @@
             transition: all 0.2s;
         }
 
-        .sidebar-nav-item:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .sidebar-nav-item.active {
-            background: var(--accent-cyan);
-            color: white;
-        }
-
-        .sidebar-nav-icon { font-size: 1.25rem; }
+        .sidebar-nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-nav-item.active { background: var(--accent-cyan); color: white; }
+        .sidebar-nav-icon { font-size: 1.25rem; min-width: 1.25rem; }
 
         .sidebar-footer {
             padding: 1.5rem;
-            margin-top: auto;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -109,11 +112,13 @@
             padding: 0.75rem;
             border-radius: 8px;
             background: rgba(255,255,255,0.05);
+            margin-bottom: 0.75rem;
         }
 
         .sidebar-user-avatar {
             width: 40px;
             height: 40px;
+            min-width: 40px;
             border-radius: 50%;
             background: var(--accent-cyan);
             display: flex;
@@ -122,22 +127,40 @@
             font-weight: 700;
         }
 
-        .sidebar-user-info h4 {
-            font-size: 0.875rem;
+        .sidebar-user-info h4 { font-size: 0.875rem; font-weight: 600; }
+        .sidebar-user-info p { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+        .logout-btn {
+            width: 100%;
+            background: rgba(255, 107, 53, 0.15);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            color: var(--accent-orange);
+            padding: 0.75rem;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .sidebar-user-info p {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
+        .logout-btn:hover {
+            background: var(--accent-orange);
+            color: white;
         }
 
         /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 260px;
+        .main-content { 
+            flex: 1; 
+            margin-left: 260px; 
             padding: 2rem;
+            transition: margin-left 0.3s ease;
         }
+
+        .main-content.expanded { margin-left: 80px; }
 
         .header {
             margin-bottom: 2rem;
@@ -150,11 +173,9 @@
             margin-bottom: 0.5rem;
         }
 
-        .header p {
-            color: var(--text-secondary);
-        }
+        .header p { color: var(--text-secondary); }
 
-        /* Filters Bar */
+        /* Filters */
         .filters-bar {
             background: white;
             padding: 1.5rem;
@@ -164,7 +185,6 @@
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
-            align-items: center;
         }
 
         .filter-group {
@@ -178,28 +198,15 @@
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
 
         .filter-group select,
         .filter-group input {
-            padding: 0.625rem 0.875rem;
+            padding: 0.625rem;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.875rem;
             min-width: 160px;
-        }
-
-        .filter-group select:focus,
-        .filter-group input:focus {
-            outline: none;
-            border-color: var(--accent-cyan);
-        }
-
-        .filter-actions {
-            margin-left: auto;
-            display: flex;
-            gap: 0.75rem;
         }
 
         .btn {
@@ -208,20 +215,13 @@
             font-weight: 600;
             font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s;
             border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            transition: all 0.2s;
         }
 
         .btn-primary {
             background: var(--accent-green);
             color: white;
-        }
-
-        .btn-primary:hover {
-            background: #16a34a;
         }
 
         .btn-secondary {
@@ -230,11 +230,7 @@
             border: 1px solid var(--border-color);
         }
 
-        .btn-secondary:hover {
-            border-color: var(--primary-blue);
-        }
-
-        /* Table Card */
+        /* Table */
         .table-card {
             background: white;
             border-radius: 12px;
@@ -250,253 +246,233 @@
             align-items: center;
         }
 
-        .table-card-header h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        thead {
-            background: var(--bg-light);
-        }
-
         th {
             padding: 1rem 1.5rem;
             text-align: left;
+            background: var(--bg-light);
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
             color: var(--text-secondary);
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s;
-        }
-
-        tbody tr:hover {
-            background: var(--bg-light);
         }
 
         td {
             padding: 1.25rem 1.5rem;
-            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-light);
         }
 
         .badge {
             display: inline-flex;
-            align-items: center;
             padding: 0.375rem 0.75rem;
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: 600;
-        }
-
-        .badge.critical {
             background: rgba(239, 68, 68, 0.1);
             color: var(--accent-red);
         }
 
-        .badge.warning {
-            background: rgba(255, 107, 53, 0.1);
-            color: var(--accent-orange);
-        }
-
-        .user-cell {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--accent-cyan);
-            color: white;
-            display: flex;
+        /* Modal Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 0.75rem;
         }
 
-        .user-info h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
+        .modal.active {
+            display: flex;
         }
 
-        .user-info p {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        /* Pagination */
-        .pagination {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
         }
 
-        .pagination-info {
-            font-size: 0.875rem;
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
             color: var(--text-secondary);
         }
 
-        .pagination-buttons {
+        .modal-body {
             display: flex;
-            gap: 0.5rem;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .pagination-buttons button {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-color);
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-
-        .pagination-buttons button:hover {
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
             background: var(--bg-light);
+            border-radius: 8px;
         }
 
-        .pagination-buttons button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-secondary);
         }
 
-        .pagination-buttons button.active {
-            background: var(--accent-cyan);
-            color: white;
-            border-color: var(--accent-cyan);
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        @media (max-width: 1024px) {
-            .sidebar { width: 220px; }
-            .main-content { margin-left: 220px; }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
         }
 
         @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; padding: 1.5rem; }
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
             .filters-bar { flex-direction: column; }
-            .filter-group { width: 100%; }
-            .filter-actions { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-layout">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <a href="/" class="sidebar-logo-img">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/company-dashboard" class="sidebar-logo">
                     <img src="/icon_1_.png" alt="AI Shield">
                     <span class="sidebar-logo-text">AI Shield</span>
                 </a>
+                <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
             </div>
 
             <nav class="sidebar-nav">
                 <a href="/company-dashboard" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">📊</span>
-                    <span>Overview</span>
+                    <span class="nav-text">Overview</span>
                 </a>
                 <a href="/detections" class="sidebar-nav-item active">
                     <span class="sidebar-nav-icon">🔍</span>
-                    <span>Detections</span>
+                    <span class="nav-text">Detections</span>
                 </a>
                 <a href="/team" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">👥</span>
-                    <span>Team</span>
+                    <span class="nav-text">Team</span>
                 </a>
                 <a href="/reports" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">📈</span>
-                    <span>Reports</span>
+                    <span class="nav-text">Reports</span>
                 </a>
                 <a href="/settings" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">⚙️</span>
-                    <span>Settings</span>
+                    <span class="nav-text">Settings</span>
                 </a>
             </nav>
 
             <div class="sidebar-footer">
                 <div class="sidebar-user">
-                    <div class="sidebar-user-avatar">AC</div>
+                    <div class="sidebar-user-avatar" id="sidebarAvatar">AC</div>
                     <div class="sidebar-user-info">
-                        <h4>Acme Corp</h4>
+                        <h4 id="sidebarCompany">Loading...</h4>
                         <p>Team Plan</p>
                     </div>
                 </div>
+                <button class="logout-btn" onclick="logout()">
+                    <span>🚪</span>
+                    <span class="nav-text">Logout</span>
+                </button>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
             <header class="header">
                 <h1>Detections</h1>
-                <p>View and manage all sensitive data detections across your team</p>
+                <p>View and manage all sensitive data detections</p>
             </header>
 
             <!-- Filters -->
             <div class="filters-bar">
                 <div class="filter-group">
                     <label>Date Range</label>
-                    <select id="dateFilter">
+                    <select id="dateFilter" onchange="applyFilters()">
+                        <option value="all">All time</option>
                         <option value="today">Today</option>
                         <option value="week">Last 7 days</option>
                         <option value="month" selected>Last 30 days</option>
-                        <option value="all">All time</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label>Data Type</label>
-                    <select id="typeFilter">
+                    <select id="typeFilter" onchange="applyFilters()">
                         <option value="all">All Types</option>
-                        <option value="cpf">CPF</option>
-                        <option value="cnpj">CNPJ</option>
-                        <option value="iban">IBAN</option>
-                        <option value="credit_card">Credit Card</option>
-                        <option value="email">Email</option>
-                        <option value="phone">Phone</option>
-                        <option value="api_key">API Key</option>
+                        <option value="CPF">CPF</option>
+                        <option value="CNPJ">CNPJ</option>
+                        <option value="IBAN">IBAN</option>
+                        <option value="CREDIT_CARD">Credit Card</option>
+                        <option value="EMAIL">Email</option>
+                        <option value="PHONE">Phone</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label>AI Platform</label>
-                    <select id="platformFilter">
+                    <select id="platformFilter" onchange="applyFilters()">
                         <option value="all">All Platforms</option>
-                        <option value="chatgpt">ChatGPT</option>
-                        <option value="claude">Claude</option>
-                        <option value="gemini">Gemini</option>
-                        <option value="copilot">Copilot</option>
+                        <option value="ChatGPT">ChatGPT</option>
+                        <option value="Claude">Claude</option>
+                        <option value="Gemini">Gemini</option>
+                        <option value="Copilot">Copilot</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>Severity</label>
-                    <select id="severityFilter">
-                        <option value="all">All Severities</option>
-                        <option value="critical">Critical</option>
-                        <option value="warning">Warning</option>
-                    </select>
+                    <label>&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
                 </div>
 
-                <div class="filter-actions">
-                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
                     <button class="btn btn-primary" onclick="exportData()">📥 Export CSV</button>
                 </div>
             </div>
@@ -504,113 +480,259 @@
             <!-- Table -->
             <div class="table-card">
                 <div class="table-card-header">
-                    <h3><span id="totalCount">247</span> Detections</h3>
-                    <div style="display: flex; gap: 0.75rem;">
-                        <input type="text" id="searchInput" placeholder="Search..." style="padding: 0.625rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 280px;">
-                    </div>
+                    <h3><span id="totalCount">0</span> Detections</h3>
+                    <input type="text" id="searchInput" placeholder="Search..." 
+                           onkeyup="applyFilters()"
+                           style="padding: 0.625rem 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
                 </div>
 
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Data Type</th>
-                                <th>AI Platform</th>
-                                <th>Severity</th>
-                                <th>Date & Time</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detectionsTable">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination">
-                    <div class="pagination-info">
-                        Showing <span id="showingStart">1</span>-<span id="showingEnd">20</span> of <span id="showingTotal">247</span>
-                    </div>
-                    <div class="pagination-buttons">
-                        <button onclick="changePage(-1)">&laquo; Previous</button>
-                        <button class="active">1</button>
-                        <button onclick="changePage(2)">2</button>
-                        <button onclick="changePage(3)">3</button>
-                        <button onclick="changePage(4)">4</button>
-                        <button onclick="changePage(1)">Next &raquo;</button>
+                <div id="tableContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h4>Loading detections...</h4>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <script>
-        // Mock data - expanded
-        const allDetections = [
-            { user: { name: 'João Silva', email: 'joao@acme.com', initials: 'JS' }, dataType: 'CPF', platform: 'ChatGPT', severity: 'critical', date: '2026-03-15 14:32' },
-            { user: { name: 'Maria Santos', email: 'maria@acme.com', initials: 'MS' }, dataType: 'IBAN', platform: 'Claude', severity: 'critical', date: '2026-03-15 13:45' },
-            { user: { name: 'Pedro Costa', email: 'pedro@acme.com', initials: 'PC' }, dataType: 'Email', platform: 'Gemini', severity: 'warning', date: '2026-03-15 12:18' },
-            { user: { name: 'Ana Oliveira', email: 'ana@acme.com', initials: 'AO' }, dataType: 'Credit Card', platform: 'ChatGPT', severity: 'critical', date: '2026-03-15 11:05' },
-            { user: { name: 'Carlos Mendes', email: 'carlos@acme.com', initials: 'CM' }, dataType: 'Phone Number', platform: 'Copilot', severity: 'warning', date: '2026-03-15 10:22' },
-            { user: { name: 'Sofia Alves', email: 'sofia@acme.com', initials: 'SA' }, dataType: 'CNPJ', platform: 'ChatGPT', severity: 'critical', date: '2026-03-15 09:47' },
-            { user: { name: 'Miguel Rodrigues', email: 'miguel@acme.com', initials: 'MR' }, dataType: 'API Key', platform: 'Claude', severity: 'critical', date: '2026-03-14 16:55' },
-            { user: { name: 'Beatriz Lima', email: 'beatriz@acme.com', initials: 'BL' }, dataType: 'NIF', platform: 'Gemini', severity: 'warning', date: '2026-03-14 15:30' },
-            { user: { name: 'João Silva', email: 'joao@acme.com', initials: 'JS' }, dataType: 'CPF', platform: 'ChatGPT', severity: 'critical', date: '2026-03-14 14:12' },
-            { user: { name: 'Maria Santos', email: 'maria@acme.com', initials: 'MS' }, dataType: 'Email', platform: 'Claude', severity: 'warning', date: '2026-03-14 13:22' },
-            { user: { name: 'Pedro Costa', email: 'pedro@acme.com', initials: 'PC' }, dataType: 'IBAN', platform: 'ChatGPT', severity: 'critical', date: '2026-03-14 11:45' },
-            { user: { name: 'Ana Oliveira', email: 'ana@acme.com', initials: 'AO' }, dataType: 'Phone Number', platform: 'Gemini', severity: 'warning', date: '2026-03-14 10:30' },
-            { user: { name: 'Carlos Mendes', email: 'carlos@acme.com', initials: 'CM' }, dataType: 'Credit Card', platform: 'ChatGPT', severity: 'critical', date: '2026-03-13 16:20' },
-            { user: { name: 'Sofia Alves', email: 'sofia@acme.com', initials: 'SA' }, dataType: 'API Key', platform: 'Claude', severity: 'critical', date: '2026-03-13 15:10' },
-            { user: { name: 'Miguel Rodrigues', email: 'miguel@acme.com', initials: 'MR' }, dataType: 'CNPJ', platform: 'Copilot', severity: 'critical', date: '2026-03-13 14:05' },
-            { user: { name: 'Beatriz Lima', email: 'beatriz@acme.com', initials: 'BL' }, dataType: 'Email', platform: 'ChatGPT', severity: 'warning', date: '2026-03-13 12:45' },
-            { user: { name: 'João Silva', email: 'joao@acme.com', initials: 'JS' }, dataType: 'IBAN', platform: 'Gemini', severity: 'critical', date: '2026-03-12 17:30' },
-            { user: { name: 'Maria Santos', email: 'maria@acme.com', initials: 'MS' }, dataType: 'CPF', platform: 'ChatGPT', severity: 'critical', date: '2026-03-12 16:15' },
-            { user: { name: 'Pedro Costa', email: 'pedro@acme.com', initials: 'PC' }, dataType: 'Phone Number', platform: 'Claude', severity: 'warning', date: '2026-03-12 15:00' },
-            { user: { name: 'Ana Oliveira', email: 'ana@acme.com', initials: 'AO' }, dataType: 'Credit Card', platform: 'ChatGPT', severity: 'critical', date: '2026-03-12 13:40' }
-        ];
+    <!-- Modal Popup -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detection Details</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
 
-        function populateTable(data = allDetections) {
-            const tbody = document.getElementById('detectionsTable');
-            tbody.innerHTML = data.map(d => `
-                <tr>
-                    <td>
-                        <div class="user-cell">
-                            <div class="user-avatar">${d.user.initials}</div>
-                            <div class="user-info">
-                                <h4>${d.user.name}</h4>
-                                <p>${d.user.email}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td><strong>${d.dataType}</strong></td>
-                    <td>${d.platform}</td>
-                    <td><span class="badge ${d.severity}">${d.severity}</span></td>
-                    <td>${d.date}</td>
-                    <td><button class="btn btn-secondary" style="padding: 0.375rem 0.75rem; font-size: 0.75rem;">View</button></td>
-                </tr>
-            `).join('');
+    <script>
+        const API_URL = 'https://ai-shield-backend-production.up.railway.app';
+        let authToken = null;
+        let currentCompany = null;
+        let allDetections = [];
+        let filteredDetections = [];
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        async function init() {
+            authToken = localStorage.getItem('authToken');
+            const companyStr = localStorage.getItem('company');
+
+            if (!authToken || !companyStr) {
+                window.location.href = '/login';
+                return;
+            }
+
+            currentCompany = JSON.parse(companyStr);
+            const initials = currentCompany.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('sidebarAvatar').textContent = initials;
+            document.getElementById('sidebarCompany').textContent = currentCompany.name;
+
+            await loadDetections();
+        }
+
+        async function loadDetections() {
+            try {
+                const response = await fetch(`${API_URL}/api/detections/${currentCompany.id}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        logout();
+                        return;
+                    }
+                    throw new Error('Failed');
+                }
+
+                allDetections = await response.json();
+                filteredDetections = [...allDetections];
+                renderTable();
+
+            } catch (error) {
+                document.getElementById('tableContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎉</div>
+                        <h4>No detections yet!</h4>
+                        <p>Install the Chrome extension to start monitoring</p>
+                    </div>
+                `;
+            }
+        }
+
+        function applyFilters() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const platformFilter = document.getElementById('platformFilter').value;
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredDetections = allDetections.filter(d => {
+                // Date filter
+                if (dateFilter !== 'all') {
+                    const detectionDate = new Date(d.timestamp);
+                    const now = new Date();
+                    const daysDiff = (now - detectionDate) / (1000 * 60 * 60 * 24);
+                    
+                    if (dateFilter === 'today' && daysDiff > 1) return false;
+                    if (dateFilter === 'week' && daysDiff > 7) return false;
+                    if (dateFilter === 'month' && daysDiff > 30) return false;
+                }
+
+                // Type filter
+                if (typeFilter !== 'all' && d.detection_type !== typeFilter) return false;
+
+                // Platform filter
+                if (platformFilter !== 'all' && d.ai_platform !== platformFilter) return false;
+
+                // Search filter
+                if (searchText && !d.user_id.toLowerCase().includes(searchText) && 
+                    !d.detection_type.toLowerCase().includes(searchText)) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            renderTable();
         }
 
         function clearFilters() {
             document.getElementById('dateFilter').value = 'month';
             document.getElementById('typeFilter').value = 'all';
             document.getElementById('platformFilter').value = 'all';
-            document.getElementById('severityFilter').value = 'all';
-            populateTable();
+            document.getElementById('searchInput').value = '';
+            applyFilters();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('tableContainer');
+            document.getElementById('totalCount').textContent = filteredDetections.length;
+
+            if (filteredDetections.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h4>No detections found</h4>
+                        <p>Try adjusting your filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Data Type</th>
+                            <th>AI Platform</th>
+                            <th>Date & Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredDetections.map((d, i) => {
+                            const date = new Date(d.timestamp);
+                            return `
+                                <tr>
+                                    <td>${d.user_id}</td>
+                                    <td><span class="badge">${d.detection_type}</span></td>
+                                    <td>${d.ai_platform || 'Unknown'}</td>
+                                    <td>${date.toLocaleDateString('en-GB')} ${date.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})}</td>
+                                    <td><button class="btn btn-secondary" onclick="viewDetails(${i})" style="padding: 0.375rem 0.75rem; font-size: 0.75rem;">View</button></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function viewDetails(index) {
+            const detection = filteredDetections[index];
+            const date = new Date(detection.timestamp);
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">User</span>
+                    <span class="detail-value">${detection.user_id}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Data Type</span>
+                    <span class="detail-value">${detection.detection_type}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">AI Platform</span>
+                    <span class="detail-value">${detection.ai_platform || 'Unknown'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date</span>
+                    <span class="detail-value">${date.toLocaleDateString('en-GB')}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time</span>
+                    <span class="detail-value">${date.toLocaleTimeString('en-GB')}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">URL</span>
+                    <span class="detail-value" style="word-break: break-all;">${detection.url || 'N/A'}</span>
+                </div>
+            `;
+
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
         }
 
         function exportData() {
-            alert('Exporting detections to CSV...\n\nThis will download a CSV file with all detections.');
+            if (filteredDetections.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const csv = [
+                ['User', 'Data Type', 'AI Platform', 'Date', 'Time', 'URL'],
+                ...filteredDetections.map(d => {
+                    const date = new Date(d.timestamp);
+                    return [
+                        d.user_id,
+                        d.detection_type,
+                        d.ai_platform || 'Unknown',
+                        date.toLocaleDateString('en-GB'),
+                        date.toLocaleTimeString('en-GB'),
+                        d.url || 'N/A'
+                    ];
+                })
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `detections_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
         }
 
-        function changePage(page) {
-            alert(`Loading page ${page}...`);
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            populateTable();
-        });
+        init();
     </script>
 </body>
 </html>
