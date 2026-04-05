@@ -95,12 +95,14 @@
         .logo-text {
             white-space: nowrap;
             overflow: hidden;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, width 0.3s;
+            flex: 1;
         }
 
         .sidebar.collapsed .logo-text {
             opacity: 0;
             width: 0;
+            display: none;
         }
 
         .logo-text h1 {
@@ -174,12 +176,13 @@
             text-transform: uppercase;
             white-space: nowrap;
             overflow: hidden;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, width 0.3s;
         }
 
         .sidebar.collapsed .sidebar-stat-label {
             opacity: 0;
             width: 0;
+            display: none;
         }
 
         .sidebar-stat-icon {
@@ -268,12 +271,13 @@
         .nav-label {
             white-space: nowrap;
             overflow: hidden;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, width 0.3s;
         }
 
         .sidebar.collapsed .nav-label {
             opacity: 0;
             width: 0;
+            display: none;
         }
 
         /* Sidebar footer */
@@ -309,12 +313,14 @@
         .user-details {
             white-space: nowrap;
             overflow: hidden;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, width 0.3s;
+            flex: 1;
         }
 
         .sidebar.collapsed .user-details {
             opacity: 0;
             width: 0;
+            display: none;
         }
 
         .user-details h4 {
@@ -356,12 +362,13 @@
         }
 
         .logout-text {
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, width 0.3s;
         }
 
         .sidebar.collapsed .logout-text {
             opacity: 0;
             width: 0;
+            display: none;
         }
 
         /* ===================================
@@ -377,6 +384,53 @@
 
         .main-content.expanded {
             margin-left: 80px;
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s;
+        }
+
+        .mobile-menu-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+        }
+
+        .mobile-menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Backdrop mobile */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-backdrop.show {
+            display: block;
+            opacity: 1;
         }
 
         /* Header */
@@ -637,22 +691,39 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
+                width: 280px;
             }
+
             .sidebar.mobile-open {
                 transform: translateX(0);
             }
+
             .main-content {
                 margin-left: 0;
+                padding: 5rem 1rem 1rem 1rem;
             }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+
             .detection-item {
                 grid-template-columns: auto 1fr;
                 gap: 1rem;
             }
+
             .detection-badge,
             .detection-time {
                 grid-column: 2;
@@ -663,6 +734,14 @@
 </head>
 <body>
     <div class="dashboard-wrapper">
+        <!-- Mobile menu button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+            ☰
+        </button>
+
+        <!-- Backdrop for mobile -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileMenu()"></div>
+
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <!-- Logo with toggle -->
@@ -842,6 +921,40 @@
             // Save state
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            sidebar.classList.toggle('mobile-open');
+            backdrop.classList.toggle('show');
+            
+            // Prevent body scroll when menu is open
+            if (sidebar.classList.contains('mobile-open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            sidebar.classList.remove('mobile-open');
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close mobile menu on nav click
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMobileMenu();
+                }
+            });
+        });
 
         // Restore sidebar state
         const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
