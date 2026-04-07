@@ -3,937 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - AI Shield</title>
+    <title>AI Shield | Admin Dashboard</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --bg-dark: #0f172a;
-            --bg-darker: #1e293b;
-            --bg-card: rgba(255, 255, 255, 0.05);
-            --border-primary: rgba(59, 130, 246, 0.3);
-            --border-hover: rgba(59, 130, 246, 0.5);
-            --accent-blue: #3b82f6;
-            --accent-cyan: #06b6d4;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-yellow: #f59e0b;
-            --text-primary: #ffffff;
-            --text-secondary: #cbd5e1;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            --bg-body: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-card: #1e293b;
+            --border: rgba(255, 255, 255, 0.05);
+            
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            
+            --sidebar-width: 240px;
+            --header-height: 64px;
+            --transition: all 0.2s ease;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
-        .dashboard-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
+        .wrapper { display: flex; min-height: 100vh; }
 
-        /* ===================================
-           SIDEBAR (RETRÁTIL)
-        =================================== */
+        /* --- Sidebar --- */
         .sidebar {
-            width: 260px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
             position: fixed;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
+            transition: var(--transition);
         }
 
-        .sidebar.collapsed {
-            width: 72px;
-        }
+        .sidebar.collapsed { width: 80px; }
 
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 2px; }
-
-        /* Logo com toggle */
-        .sidebar-logo {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .logo-main {
+        .sidebar-header {
+            height: var(--header-height);
             display: flex;
             align-items: center;
-            gap: 0.875rem;
-            flex: 1;
+            padding: 0 1.25rem;
+            border-bottom: 1px solid var(--border);
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
+        .logo-box {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
         }
 
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
+        .logo-img {
+            width: 28px;
+            height: 28px;
             object-fit: contain;
-            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4));
         }
 
         .logo-text {
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.3s, width 0.3s;
-            flex: 1;
-        }
-
-        .sidebar.collapsed .logo-text {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
-
-        .logo-text h1 {
-            font-size: 1.125rem;
-            font-weight: 800;
-            margin-bottom: 0.125rem;
-        }
-
-        .logo-text p {
-            font-size: 0.6875rem;
-            color: var(--accent-cyan);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Toggle button */
-        .sidebar-toggle {
-            width: 100%;
-            height: 40px;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1.25rem;
-            color: var(--text-primary);
-        }
-
-        .sidebar-toggle:hover {
-            background: rgba(59, 130, 246, 0.25);
-            border-color: rgba(59, 130, 246, 0.5);
-        }
-
-        .sidebar.collapsed .sidebar-logo {
-            padding: 1rem 0.75rem;
-        }
-
-        .sidebar.collapsed .logo-main {
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .sidebar-toggle {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto;
-        }
-
-        /* Stats in sidebar */
-        .sidebar-stats {
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .sidebar-stat {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 8px;
-            padding: 0.875rem;
-            margin-bottom: 0.75rem;
-            transition: all 0.2s;
-        }
-
-        .sidebar-stat:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--border-hover);
-        }
-
-        .sidebar-stat:last-child { margin-bottom: 0; }
-
-        .sidebar-stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar-stat-label {
-            font-size: 0.6875rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.3s, width 0.3s;
-        }
-
-        .sidebar.collapsed .sidebar-stat-label {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
-
-        .sidebar-stat-icon {
-            font-size: 1.125rem;
-        }
-
-        .sidebar-stat-value {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--text-primary);
-        }
-
-        .sidebar.collapsed .sidebar-stat-value {
-            font-size: 1.25rem;
-            text-align: center;
-        }
-
-        /* Navigation */
-        .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 1rem;
-        }
-
-        .nav-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .nav-section-title {
-            font-size: 0.6875rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            text-transform: uppercase;
+            letter-spacing: -0.3px;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed .logo-text { opacity: 0; width: 0; display: none; }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1.25rem 0.75rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.65rem 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 0.625rem;
-            letter-spacing: 0.05em;
-            padding: 0 0.75rem;
-            transition: opacity 0.3s;
-        }
-
-        .sidebar.collapsed .nav-section-title {
-            opacity: 0;
-            height: 0;
-            margin: 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            border-radius: 8px;
-            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.2s;
-            margin-bottom: 0.25rem;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
             font-weight: 500;
-            position: relative;
+            transition: var(--transition);
         }
 
-        .nav-item:hover {
+        .nav-link i { width: 20px; margin-right: 10px; font-size: 1rem; }
+
+        .nav-link:hover, .nav-link.active {
             background: rgba(59, 130, 246, 0.1);
-            color: var(--text-primary);
+            color: var(--primary);
         }
 
-        .nav-item.active {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--text-primary);
-        }
+        .sidebar.collapsed .nav-link span { display: none; }
 
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 20px;
-            background: var(--accent-cyan);
-            border-radius: 0 2px 2px 0;
-        }
-
-        .nav-icon {
-            font-size: 1.125rem;
-            min-width: 1.125rem;
-        }
-
-        .nav-label {
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.3s, width 0.3s;
-        }
-
-        .sidebar.collapsed .nav-label {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
-
-        /* Sidebar footer */
         .sidebar-footer {
-            padding: 1rem;
-            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
         }
 
-        .user-profile {
+        .user-card {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
+            gap: 10px;
+            background: rgba(255,255,255,0.03);
+            padding: 8px;
             border-radius: 8px;
-            margin-bottom: 0.625rem;
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 0.9375rem;
+            font-weight: 600;
+            font-size: 0.8rem;
         }
 
-        .user-details {
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.3s, width 0.3s;
-            flex: 1;
-        }
+        .user-info { transition: var(--transition); }
+        .sidebar.collapsed .user-info { display: none; }
+        .user-name { display: block; font-size: 0.85rem; font-weight: 600; }
+        .company-name { display: block; font-size: 0.7rem; color: var(--text-muted); }
 
-        .sidebar.collapsed .user-details {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
-
-        .user-details h4 {
-            font-size: 0.875rem;
-            font-weight: 700;
-            margin-bottom: 0.125rem;
-        }
-
-        .user-details p {
-            font-size: 0.6875rem;
-            color: var(--text-muted);
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--accent-red);
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.8125rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: rgba(239, 68, 68, 0.5);
-        }
-
-        .logout-icon {
-            font-size: 1rem;
-        }
-
-        .logout-text {
-            transition: opacity 0.3s, width 0.3s;
-        }
-
-        .sidebar.collapsed .logout-text {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
-
-        /* ===================================
-           MAIN CONTENT
-        =================================== */
+        /* --- Main Content --- */
         .main-content {
             flex: 1;
-            margin-left: 260px;
-            padding: 2rem;
-            max-width: 1600px;
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: var(--transition);
         }
 
-        .main-content.expanded {
-            margin-left: 72px;
-        }
+        .main-content.expanded { margin-left: 80px; }
 
-        /* Mobile menu button */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            transition: all 0.2s;
-        }
-
-        .mobile-menu-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
-        }
-
-        .mobile-menu-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Backdrop mobile */
-        .sidebar-backdrop {
-            display: none;
-            position: fixed;
+        header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s;
+            z-index: 900;
         }
 
-        .sidebar-backdrop.show {
-            display: block;
-            opacity: 1;
-        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .toggle-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
 
-        /* Header */
-        .page-header {
-            margin-bottom: 2rem;
-        }
+        .content-body { padding: 2rem; max-width: 1400px; margin: 0 auto; }
 
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-        }
-
-        .page-header p {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        /* Stats grid - MAIS ORGANIZADO */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.25rem;
             margin-bottom: 2rem;
-        }
-
-        @media (min-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
         }
 
         .stat-card {
             background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--card-gradient-start), var(--card-gradient-end));
-        }
-
-        .stat-card:nth-child(1) {
-            --card-gradient-start: #3b82f6;
-            --card-gradient-end: #06b6d4;
-        }
-
-        .stat-card:nth-child(2) {
-            --card-gradient-start: #ef4444;
-            --card-gradient-end: #dc2626;
-        }
-
-        .stat-card:nth-child(3) {
-            --card-gradient-start: #f59e0b;
-            --card-gradient-end: #d97706;
-        }
-
-        .stat-card:nth-child(4) {
-            --card-gradient-start: #10b981;
-            --card-gradient-end: #059669;
-        }
-
-        .stat-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--border-hover);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.25rem;
-        }
-
-        .stat-card-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.05em;
-        }
-
-        .stat-card-icon {
-            font-size: 2rem;
-            opacity: 0.8;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-        }
-
-        .stat-card-value {
-            font-size: 2.75rem;
-            font-weight: 900;
-            margin-bottom: 0.625rem;
-            line-height: 1;
-        }
-
-        .stat-card-description {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.875rem;
-        }
-
-        .stat-card-trend {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            padding: 0.5rem 0.875rem;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* Section - MAIS ORGANIZADA */
-        .section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.75rem;
-            padding-bottom: 1.25rem;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .section-header h3 {
-            font-size: 1.375rem;
-            font-weight: 800;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-        }
-
-        /* Detection list - MAIS ORGANIZADA */
-        .detection-item {
-            display: grid;
-            grid-template-columns: auto 1fr auto auto;
-            gap: 1.25rem;
-            align-items: center;
             padding: 1.25rem;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
-            transition: all 0.2s;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
-        .detection-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; display: block; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--text-main); }
+        .stat-footer { margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Detections Section */
+        .section-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .section-title { font-size: 1rem; font-weight: 600; }
+
+        .detection-list { display: flex; flex-direction: column; gap: 10px; }
+        
+        .detection-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
             border-radius: 8px;
-            border-bottom-color: transparent;
+            border: 1px solid var(--border);
+            transition: var(--transition);
         }
 
-        .detection-item:last-child {
-            border-bottom: none;
-        }
+        .detection-item:hover { background: rgba(255,255,255,0.04); }
 
-        .detection-avatar {
-            width: 48px;
-            height: 48px;
+        .det-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            background: #475569;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 12px;
         }
 
-        .detection-details h4 {
-            font-size: 0.9375rem;
+        .det-info { flex: 1; }
+        .det-user { display: block; font-size: 0.85rem; font-weight: 600; }
+        .det-desc { display: block; font-size: 0.75rem; color: var(--text-muted); }
+
+        .det-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
             font-weight: 700;
-            margin-bottom: 0.375rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            margin-right: 15px;
         }
 
-        .detection-details p {
-            font-size: 0.8125rem;
-            color: var(--text-muted);
-        }
+        .det-time { font-size: 0.75rem; color: var(--text-muted); }
 
-        .detection-badge {
-            padding: 0.5rem 1rem;
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--accent-red);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .empty-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
 
-        .detection-time {
-            font-size: 0.8125rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            min-width: 80px;
-            text-align: right;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .empty-state-icon {
-            font-size: 5rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.3;
-        }
-
-        .empty-state h4 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 0.75rem;
-        }
-
-        .empty-state p {
-            font-size: 1rem;
-            color: var(--text-muted);
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .sidebar.collapsed {
-                width: 280px;
-            }
-
-            /* Esconder toggle desktop no mobile */
-            .sidebar-toggle {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 5rem 1rem 1rem 1rem;
-            }
-
-            .main-content.expanded {
-                margin-left: 0;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .detection-item {
-                grid-template-columns: auto 1fr;
-                gap: 1rem;
-            }
-
-            .detection-badge,
-            .detection-time {
-                grid-column: 2;
-                justify-self: start;
-            }
-        }
-
-        @media (min-width: 769px) {
-            /* Esconder botão mobile no desktop */
-            .mobile-menu-btn {
-                display: none !important;
-            }
-
-            .sidebar-backdrop {
-                display: none !important;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); width: 240px; }
+            .main-content { margin-left: 0; }
+            .main-content.expanded { margin-left: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-wrapper">
-        <!-- Mobile menu button -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
-            ☰
-        </button>
 
-        <!-- Backdrop for mobile -->
-        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileMenu()"></div>
-
-        <!-- SIDEBAR -->
+    <div class="wrapper">
         <aside class="sidebar" id="sidebar">
-            <!-- Logo with toggle -->
-            <div class="sidebar-logo">
-                <div class="logo-main">
-                    <div class="logo-icon">
-                        <img src="icon.png" alt="AI Shield">
-                    </div>
-                    <div class="logo-text">
-                        <h1>AI Shield</h1>
-                        <p>Dashboard</p>
-                    </div>
-                </div>
-                <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+            <div class="sidebar-header">
+                <a href="#" class="logo-box">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAADNXWNhQlgAAM1danVtYgAAAB5qdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAA5Wp1bWIAAAApanVtZGNib3IAEQAQgAAAqgA4m3EDYzJwYS5hY3Rpb25zLnYyAAAAALRjYm9yoWdhY3Rpb25zgqNmYWN0aW9ubGMycGEuY3JlYXRlZG1zb2Z0d2FyZUFnZW50v2RuYW1lZkdQVC00b/9xZGlnaXRhbFNvdXJjZVR5cGV4Rmh0dHA6Ly9jdi5pcHRjLm9yZy9uZXdzY29kZXMvZGlnaXRhbHNvdXJjZXR5cGUvdHJhaW5lZEFsZ29yaXRobWljTWVkaWGhZmFjdGlvbm5jMnBhLmNvbnZlcnRlZAAAAKtqdW1iAAAAKGp1bWRjYm9yABEAEIAAAKoAOJtxA2MycGEuaGFzaC5kYXRhAAAAAHtjYm9ypWpleGNsdXNpb25zgaJlc3RhcnQYIWZsZW5ndGgZNydkbmFtZW5qdW1iZiBtYW5pZmVzdGNhbGdmc2hhMjU2ZGhhc2hYILruj6QgXM1/rD1tCdUZjVAok5Hkuo1gShr2OHoak6lgY3BhZEgAAAAAAAAAAAAAAe5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAABv2Nib3Kmamluc3RhbmNlSUR4LHhtcPppaWQ6ZDk0NGM1ODctOTUzNy00MmYxLWI3ZTYtOGIwYzY4MTM5ODI0dGNsYWltX2dlbmVyYXRvcl9pbmZov2RuYW1lZ0NoYXRHUFR3b3JnLmNvbnRlbnRhdXRoLmMycGFfcnNmMC42Ny4x/2lzaWduYXR1cmV4TXNlbGYjanVtYmY9L2MycGEvdXJuOmMycGE6NjdlODExOWEtOTRkOC00YjY1LWE4ZmYtMzIzN2Q3MjY2ZDcwL2MycGEuc2lnbmF0dXJlcmNyZWF0ZWRfYXNzZXJ0aW9uc4KiY3VybHgqc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5hY3Rpb25zLnYyZGhhc2hYII9OoyotmtGJ2mI9SUEyQP312im5mlYkGrGNlmEyEzy1omN1cmx4KXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25z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" alt="AI Shield Logo" class="logo-img">
+                    <span class="logo-text">AI Shield</span>
+                </a>
             </div>
 
-            <!-- Quick stats -->
-            <div class="sidebar-stats">
-                <div class="sidebar-stat">
-                    <div class="sidebar-stat-header">
-                        <span class="sidebar-stat-label">Today</span>
-                        <span class="sidebar-stat-icon">🔍</span>
-                    </div>
-                    <div class="sidebar-stat-value" id="todayCount">0</div>
-                </div>
-                <div class="sidebar-stat">
-                    <div class="sidebar-stat-header">
-                        <span class="sidebar-stat-label">Saved</span>
-                        <span class="sidebar-stat-icon">💰</span>
-                    </div>
-                    <div class="sidebar-stat-value" id="savedAmount">€0</div>
-                </div>
-            </div>
-
-            <!-- Navigation -->
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-section-title">Dashboard</div>
-                    <a href="/company-dashboard" class="nav-item active">
-                        <span class="nav-icon">📊</span>
-                        <span class="nav-label">Overview</span>
-                    </a>
-                    <a href="/detections" class="nav-item">
-                        <span class="nav-icon">🔍</span>
-                        <span class="nav-label">Detections</span>
-                    </a>
-                    <a href="/team" class="nav-item">
-                        <span class="nav-icon">👥</span>
-                        <span class="nav-label">Team</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Analytics</div>
-                    <a href="/reports" class="nav-item">
-                        <span class="nav-icon">📈</span>
-                        <span class="nav-label">Reports</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Settings</div>
-                    <a href="/settings" class="nav-item">
-                        <span class="nav-icon">⚙️</span>
-                        <span class="nav-label">Settings</span>
-                    </a>
-                </div>
+            <nav class="nav-menu">
+                <li><a href="/dashboard" class="nav-link active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+                <li><a href="/employees" class="nav-link"><i class="fas fa-users"></i> <span>Employees</span></a></li>
+                <li><a href="/detections" class="nav-link"><i class="fas fa-search"></i> <span>Detections</span></a></li>
+                <li><a href="/policies" class="nav-link"><i class="fas fa-shield-alt"></i> <span>Policies</span></a></li>
+                <li><a href="/settings" class="nav-link"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
             </nav>
 
-            <!-- User footer -->
             <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar" id="userAvatar">AC</div>
-                    <div class="user-details">
-                        <h4 id="companyName">Company</h4>
-                        <p>Team Plan</p>
+                <div class="user-card">
+                    <div class="user-avatar" id="userAvatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name" id="userName">Admin</span>
+                        <span class="company-name" id="companyName">AI Shield</span>
                     </div>
                 </div>
-                <button class="logout-btn" onclick="logout()">
-                    <span class="logout-icon">🚪</span>
-                    <span class="logout-text">Logout</span>
-                </button>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content" id="mainContent">
-            <!-- Header -->
-            <header class="page-header">
-                <h1>Dashboard</h1>
-                <p>Welcome back, <span id="userName">Admin</span></p>
+            <header>
+                <div class="header-left">
+                    <button class="toggle-btn" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">Security Overview</div>
+                </div>
+                <div class="header-right">
+                    <button onclick="logout()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem; font-weight:600;">LOGOUT</button>
+                </div>
             </header>
 
-            <!-- Stats grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-card-title">Total Detections</span>
-                        <span class="stat-card-icon">🛡️</span>
+            <div class="content-body">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Total Detections</span>
+                        <div class="stat-value" id="totalDetections">0</div>
+                        <div class="stat-footer">All time activity</div>
                     </div>
-                    <div class="stat-card-value" id="totalDetections">0</div>
-                    <div class="stat-card-description">All time protected</div>
-                    <div class="stat-card-trend">
-                        <span>↑</span>
-                        <span>12% this month</span>
+                    <div class="stat-card">
+                        <span class="stat-label">Critical Risks</span>
+                        <div class="stat-value" id="criticalDetections" style="color: var(--danger);">0</div>
+                        <div class="stat-footer">Immediate action required</div>
                     </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-card-title">Critical</span>
-                        <span class="stat-card-icon">🔴</span>
+                    <div class="stat-card">
+                        <span class="stat-label">Suspicious Activity</span>
+                        <div class="stat-value" id="suspiciousDetections" style="color: var(--warning);">0</div>
+                        <div class="stat-footer">Under review</div>
                     </div>
-                    <div class="stat-card-value" id="criticalDetections">0</div>
-                    <div class="stat-card-description">Confirmed leaks</div>
-                    <div class="stat-card-trend" style="background: rgba(239,68,68,0.15); color: #ef4444;">
-                        <span>€50k</span>
-                        <span>avg fine</span>
+                    <div class="stat-card">
+                        <span class="stat-label">Fines Prevented</span>
+                        <div class="stat-value" id="savedAmount">€0</div>
+                        <div class="stat-footer">Estimated GDPR savings</div>
                     </div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-card-title">Suspicious</span>
-                        <span class="stat-card-icon">⚠️</span>
+                <!-- Detections -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">Recent Real-Time Detections</h3>
+                        <a href="/detections" style="color: var(--primary); font-size: 0.8rem; text-decoration: none; font-weight: 600;">VIEW ALL</a>
                     </div>
-                    <div class="stat-card-value" id="suspiciousDetections">0</div>
-                    <div class="stat-card-description">Potential risks</div>
-                    <div class="stat-card-trend" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
-                        <span>↓</span>
-                        <span>5% vs last month</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <span class="stat-card-title">Team</span>
-                        <span class="stat-card-icon">👥</span>
-                    </div>
-                    <div class="stat-card-value" id="teamCount">0</div>
-                    <div class="stat-card-description">Protected users</div>
-                    <div class="stat-card-trend">
-                        <span>✓</span>
-                        <span>All active</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent detections -->
-            <div class="section">
-                <div class="section-header">
-                    <h3>Recent Detections</h3>
-                    <a href="/detections" class="btn">View All</a>
-                </div>
-                <div id="detectionsContent">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🎉</div>
-                        <h4>No detections yet</h4>
-                        <p>Your team is protected. Detections will appear here.</p>
+                    <div id="detectionsContent" class="detection-list">
+                        <div class="empty-state">
+                            <span class="empty-icon">🛡️</span>
+                            <p>Connecting to secure monitoring server...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -943,144 +349,85 @@
     <script>
         const API_URL = 'https://ai-shield-backend-production.up.railway.app';
 
-        // Sidebar toggle
+        // Sidebar logic
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
-            
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
-            
-            // Save state
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        // Mobile menu functions
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            
-            sidebar.classList.toggle('mobile-open');
-            backdrop.classList.toggle('show');
-            
-            // Prevent body scroll when menu is open
-            if (sidebar.classList.contains('mobile-open')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        }
-
-        function closeMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            
-            sidebar.classList.remove('mobile-open');
-            backdrop.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-
-        // Close mobile menu on nav click
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeMobileMenu();
-                }
-            });
-        });
-
-        // Restore sidebar state
-        const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        if (sidebarCollapsed) {
+        // Restore state
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
             document.getElementById('sidebar').classList.add('collapsed');
             document.getElementById('mainContent').classList.add('expanded');
         }
 
-        // Auth check
+        // Auth & UI Data
         const authToken = localStorage.getItem('authToken');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const company = JSON.parse(localStorage.getItem('company') || '{}');
 
-        if (!authToken) {
-            window.location.href = '/login';
-        }
+        if (!authToken) window.location.href = '/login';
 
-        // Update UI
         document.getElementById('userName').textContent = user.email?.split('@')[0] || 'Admin';
-        document.getElementById('companyName').textContent = company.name || 'Company';
-        const initials = company.name?.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'AC';
+        document.getElementById('companyName').textContent = company.name || 'AI Shield';
+        const initials = company.name?.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'AS';
         document.getElementById('userAvatar').textContent = initials;
 
-        // Load stats
+        // Fetch Stats
         async function loadStats() {
             try {
                 const response = await fetch(`${API_URL}/api/dashboard/stats/${company.id}`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
-
                 if (!response.ok) return;
-
                 const stats = await response.json();
 
                 document.getElementById('totalDetections').textContent = stats.totalDetections || 0;
                 document.getElementById('criticalDetections').textContent = stats.criticalDetections || 0;
                 document.getElementById('suspiciousDetections').textContent = stats.suspiciousDetections || 0;
-                document.getElementById('teamCount').textContent = stats.teamCount || 1;
-                document.getElementById('todayCount').textContent = stats.todayCount || 0;
                 
                 const saved = ((stats.totalDetections || 0) * 50000);
                 document.getElementById('savedAmount').textContent = saved > 1000000 
                     ? `€${(saved / 1000000).toFixed(1)}M`
                     : `€${(saved / 1000).toFixed(0)}k`;
 
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
+            } catch (e) { console.error('Stats error:', e); }
         }
 
-        // Load detections
+        // Fetch Detections
         async function loadDetections() {
             try {
                 const response = await fetch(`${API_URL}/api/detections/${company.id}`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
-
                 if (!response.ok) return;
-
                 const detections = await response.json();
                 const content = document.getElementById('detectionsContent');
 
                 if (detections.length === 0) {
-                    content.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🎉</div>
-                            <h4>No detections yet</h4>
-                            <p>Your team is protected. Detections will appear here.</p>
-                        </div>
-                    `;
+                    content.innerHTML = '<div class="empty-state"><span class="empty-icon">🎉</span><h4>All clear</h4><p>No threats detected at the moment.</p></div>';
                     return;
                 }
 
-                content.innerHTML = detections.slice(0, 10).map(d => {
+                content.innerHTML = detections.slice(0, 8).map(d => {
                     const time = new Date(d.timestamp).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'});
                     const initials = d.user_id.substring(0, 2).toUpperCase();
-                    
                     return `
                         <div class="detection-item">
-                            <div class="detection-avatar">${initials}</div>
-                            <div class="detection-details">
-                                <h4>${d.user_id}</h4>
-                                <p>${d.detection_type} on ${d.ai_platform || 'AI Platform'}</p>
+                            <div class="det-avatar">${initials}</div>
+                            <div class="det-info">
+                                <span class="det-user">${d.user_id}</span>
+                                <span class="det-desc">${d.detection_type} on ${d.ai_platform || 'AI Platform'}</span>
                             </div>
-                            <div class="detection-badge">${d.detection_type}</div>
-                            <div class="detection-time">${time}</div>
+                            <div class="det-badge">${d.detection_type}</div>
+                            <div class="det-time">${time}</div>
                         </div>
                     `;
                 }).join('');
-
-            } catch (error) {
-                console.error('Error loading detections:', error);
-            }
+            } catch (e) { console.error('Detections error:', e); }
         }
 
         function logout() {
