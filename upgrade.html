@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escolhe o teu plano — AI Shield</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #F7F8FA; padding: 60px 24px; }
+    h1 { text-align: center; font-size: 32px; color: #0D1117; margin-bottom: 12px; }
+    .sub { text-align: center; color: #6B7280; margin-bottom: 40px; }
+    .toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; }
+    .toggle button { padding: 8px 20px; border-radius: 8px; border: 1.5px solid #E3E8EF;
+      background: white; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .toggle button.activo { background: #0052CC; color: white; border-color: #0052CC; }
+    .planos { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+      max-width: 900px; margin: 0 auto; }
+    .plano { background: white; border: 1.5px solid #E3E8EF; border-radius: 14px;
+      padding: 28px; position: relative; }
+    .plano.popular { border-color: #0052CC; }
+    .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: #0052CC; color: white; font-size: 11px; font-weight: 700;
+      padding: 3px 12px; border-radius: 100px; white-space: nowrap; }
+    .nome { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .users { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+    .preco { font-size: 42px; font-weight: 800; color: #0D1117; line-height: 1; }
+    .preco span { font-size: 14px; color: #6B7280; font-weight: 400; }
+    .economia { font-size: 12px; color: #059669; font-weight: 500;
+      margin: 4px 0 16px; min-height: 18px; }
+    .desc { font-size: 14px; color: #6B7280; margin-bottom: 24px; line-height: 1.6; }
+    .btn-plano { width: 100%; padding: 12px; background: #0052CC; color: white;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-plano:hover { background: #0040A8; }
+    .btn-plano:disabled { background: #94A3B8; cursor: not-allowed; }
+    .nota { text-align: center; color: #9CA3AF; font-size: 13px; margin-top: 28px; }
+    @media (max-width: 700px) { .planos { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>Escolhe o teu plano de compliance</h1>
+  <p class="sub">Sem compromisso — cancela a qualquer momento.</p>
+ 
+  <div class="toggle">
+    <button id="btn-mensal" class="activo" onclick="setCiclo('monthly')">Mensal</button>
+    <button id="btn-anual" onclick="setCiclo('annual')">Anual — poupa 20%</button>
+  </div>
+ 
+  <div class="planos" id="planos"></div>
+  <p class="nota">14 dias de trial gratuito em todos os planos · Sem cartão de crédito</p>
+ 
+  <script>
+    const API = 'https://ai-shield-backend-production.up.railway.app'; // ← SUBSTITUI PELO TEU URL
+ 
+    const PLANOS = [
+      { key:'essentials', nome:'Essentials', users:'Até 10 utilizadores',
+        desc:'Visibilidade total do que a tua equipa partilha com a AI.',
+        m:49, a:39, ma:468 },
+      { key:'compliance', nome:'Compliance', users:'Até 30 utilizadores',
+        desc:'Relatórios GDPR Art. 32 prontos para o teu DPO.',
+        m:99, a:79, ma:948, popular:true },
+      { key:'business', nome:'Business', users:'Até 75 utilizadores',
+        desc:'SSO, API, relatórios white-label e gestor de conta.',
+        m:249, a:199, ma:2388 },
+    ];
+ 
+    let ciclo = 'monthly';
+ 
+    function setCiclo(c) {
+      ciclo = c;
+      document.getElementById('btn-mensal').className = c==='monthly' ? 'activo' : '';
+      document.getElementById('btn-anual').className  = c==='annual'  ? 'activo' : '';
+      render();
+    }
+ 
+    function render() {
+      const container = document.getElementById('planos');
+      container.innerHTML = PLANOS.map(p => `
+        <div class="plano ${p.popular?'popular':''}">
+          ${p.popular ? '<div class="badge">Mais popular</div>' : ''}
+          <div class="nome">${p.nome}</div>
+          <div class="users">${p.users}</div>
+          <div class="preco">€${ciclo==='monthly'?p.m:p.a}<span>/mês</span></div>
+          <div class="economia">${ciclo==='annual' ? '€'+p.ma+' faturado anualmente' : ''}</div>
+          <div class="desc">${p.desc}</div>
+          <button class="btn-plano" id="btn-${p.key}"
+            onclick="escolherPlano('${p.key}')">Começar agora</button>
+        </div>
+      `).join('');
+    }
+ 
+    async function escolherPlano(plano) {
+      const btn = document.getElementById('btn-' + plano);
+      btn.disabled = true;
+      btn.textContent = 'A redirecionar...';
+ 
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html?redirect=/upgrade.html';
+        return;
+      }
+ 
+      try {
+        const res = await fetch(API + '/billing/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json',
+                     'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ plan: plano, cycle: ciclo })
+        });
+        const data = await res.json();
+        if (data.url) { window.location.href = data.url; }
+        else { alert('Erro. Tenta novamente.'); btn.disabled=false; btn.textContent='Começar agora'; }
+      } catch(e) {
+        alert('Erro de ligação. Tenta novamente.');
+        btn.disabled=false; btn.textContent='Começar agora';
+      }
+    }
+ 
+    render();
+  </script>
+</body>
+</html>
+
+
