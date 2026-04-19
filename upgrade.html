@@ -1,131 +1,95 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Choose your plan — AI Shield</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #F7F8FA; color: #0D1117; }
-    
-    /* Header & Logo Styles */
-    header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: white; border-bottom: 1.5px solid #E3E8EF; }
-    .logo-container { display: flex; align-items: center; text-decoration: none; }
-    .logo-full { height: 40px; }
-    
-    .container { padding: 60px 24px; max-width: 1000px; margin: 0 auto; }
-    h1 { text-align: center; font-size: 32px; margin-bottom: 12px; }
+    body { font-family: sans-serif; background: #F7F8FA; padding: 60px 24px; }
+    h1 { text-align: center; font-size: 32px; color: #0D1117; margin-bottom: 12px; }
     .sub { text-align: center; color: #6B7280; margin-bottom: 40px; }
-    
     .toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; }
     .toggle button { padding: 8px 20px; border-radius: 8px; border: 1.5px solid #E3E8EF;
-      background: white; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .toggle button.active { background: #0052CC; color: white; border-color: #0052CC; }
-    
-    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .plan { background: white; border: 1.5px solid #E3E8EF; border-radius: 14px;
-      padding: 28px; position: relative; display: flex; flex-direction: column; }
-    .plan.popular { border-color: #0052CC; box-shadow: 0 4px 20px rgba(0, 82, 204, 0.1); }
-    
+      background: white; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .toggle button.activo { background: #0052CC; color: white; border-color: #0052CC; }
+    .planos { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+      max-width: 900px; margin: 0 auto; }
+    .plano { background: white; border: 1.5px solid #E3E8EF; border-radius: 14px;
+      padding: 28px; position: relative; }
+    .plano.popular { border-color: #0052CC; }
     .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
       background: #0052CC; color: white; font-size: 11px; font-weight: 700;
-      padding: 3px 12px; border-radius: 100px; white-space: nowrap; text-transform: uppercase; }
-    
-    .plan-header { margin-bottom: 20px; }
-    .logo-mini { width: 24px; height: 24px; margin-bottom: 12px; }
-    .name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+      padding: 3px 12px; border-radius: 100px; white-space: nowrap; }
+    .nome { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
     .users { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
-    
-    .price { font-size: 42px; font-weight: 800; color: #0D1117; line-height: 1; }
-    .price span { font-size: 14px; color: #6B7280; font-weight: 400; }
-    .savings { font-size: 12px; color: #059669; font-weight: 500;
+    .preco { font-size: 42px; font-weight: 800; color: #0D1117; line-height: 1; }
+    .preco span { font-size: 14px; color: #6B7280; font-weight: 400; }
+    .economia { font-size: 12px; color: #059669; font-weight: 500;
       margin: 4px 0 16px; min-height: 18px; }
-    
-    .desc { font-size: 14px; color: #6B7280; margin-bottom: 24px; line-height: 1.6; flex-grow: 1; }
-    
-    .btn-plan { width: 100%; padding: 12px; background: #0052CC; color: white;
-      border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .btn-plan:hover { background: #0040A8; }
-    .btn-plan:disabled { background: #94A3B8; cursor: not-allowed; }
-    
-    .note { text-align: center; color: #9CA3AF; font-size: 13px; margin-top: 40px; }
-    
-    footer { text-align: center; padding: 40px; color: #6B7280; font-size: 12px; border-top: 1.5px solid #E3E8EF; margin-top: 60px; }
-    .footer-logo { height: 30px; opacity: 0.6; margin-bottom: 12px; }
-
-    @media (max-width: 850px) { .plans { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; } }
+    .desc { font-size: 14px; color: #6B7280; margin-bottom: 24px; line-height: 1.6; }
+    .btn-plano { width: 100%; padding: 12px; background: #0052CC; color: white;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-plano:hover { background: #0040A8; }
+    .btn-plano:disabled { background: #94A3B8; cursor: not-allowed; }
+    .nota { text-align: center; color: #9CA3AF; font-size: 13px; margin-top: 28px; }
+    @media (max-width: 700px) { .planos { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <header>
-    <a href="/" class="logo-container">
-      <img src="assets/logo-full.png" alt="AI Shield Logo" class="logo-full">
-    </a>
-  </header>
-
-  <div class="container">
-    <h1>Choose your compliance plan</h1>
-    <p class="sub">No commitment — cancel at any time.</p>
-   
-    <div class="toggle">
-      <button id="btn-monthly" class="active" onclick="setCycle('monthly')">Monthly</button>
-      <button id="btn-annual" onclick="setCycle('annual')">Annual — save 20%</button>
-    </div>
-   
-    <div class="plans" id="plans"></div>
-    <p class="note">14-day free trial on all plans · No credit card required</p>
+  <h1>Choose your compliance plan</h1>
+  <p class="sub">No commitment — cancel at any time.</p>
+ 
+  <div class="toggle">
+    <button id="btn-mensal" class="activo" onclick="setCiclo('monthly')">Monthly</button>
+    <button id="btn-anual" onclick="setCiclo('annual')">Annual — save 20%</button>
   </div>
-
-  <footer>
-    <img src="assets/logo-mini.png" alt="AI Shield Icon" class="footer-logo">
-    <p>&copy; 2026 AI Shield Ltd. All rights reserved. Registered in the UK.</p>
-  </footer>
+ 
+  <div class="planos" id="planos"></div>
+  <p class="nota">14-day free trial on all plans · No credit card required</p>
  
   <script>
-    const API = 'https://ai-shield-backend-production.up.railway.app';
-
-    const PLANS = [
-      { key:'essentials', name:'Essentials', users:'Up to 10 users',
+    const API = 'https://ai-shield-backend-production.up.railway.app'; // ← REPLACE WITH YOUR URL
+ 
+    const PLANOS = [
+      { key:'essentials', nome:'Essentials', users:'Up to 10 users',
         desc:'Total visibility of what your team shares with AI.',
         m:49, a:39, ma:468 },
-      { key:'compliance', name:'Compliance', users:'Up to 30 users',
+      { key:'compliance', nome:'Compliance', users:'Up to 30 users',
         desc:'GDPR Art. 32 reports ready for your DPO.',
         m:99, a:79, ma:948, popular:true },
-      { key:'business', name:'Business', users:'Up to 75 users',
+      { key:'business', nome:'Business', users:'Up to 75 users',
         desc:'SSO, API, white-label reports, and account manager.',
         m:249, a:199, ma:2388 },
     ];
  
-    let cycle = 'monthly';
+    let ciclo = 'monthly';
  
-    function setCycle(c) {
-      cycle = c;
-      document.getElementById('btn-monthly').className = c==='monthly' ? 'active' : '';
-      document.getElementById('btn-annual').className  = c==='annual'  ? 'active' : '';
+    function setCiclo(c) {
+      ciclo = c;
+      document.getElementById('btn-mensal').className = c==='monthly' ? 'activo' : '';
+      document.getElementById('btn-anual').className  = c==='annual'  ? 'activo' : '';
       render();
     }
  
     function render() {
-      const container = document.getElementById('plans');
-      container.innerHTML = PLANS.map(p => `
-        <div class="plan ${p.popular?'popular':''}">
+      const container = document.getElementById('planos');
+      container.innerHTML = PLANOS.map(p => `
+        <div class="plano ${p.popular?'popular':''}">
           ${p.popular ? '<div class="badge">Most popular</div>' : ''}
-          <div class="plan-header">
-            <img src="assets/logo-mini.png" alt="" class="logo-mini">
-            <div class="name">${p.name}</div>
-            <div class="users">${p.users}</div>
-          </div>
-          <div class="price">£${cycle==='monthly'?p.m:p.a}<span>/month</span></div>
-          <div class="savings">${cycle==='annual' ? '£'+p.ma+' billed annually' : ''}</div>
+          <div class="nome">${p.nome}</div>
+          <div class="users">${p.users}</div>
+          <div class="preco">€${ciclo==='monthly'?p.m:p.a}<span>/month</span></div>
+          <div class="economia">${ciclo==='annual' ? '€'+p.ma+' billed annually' : ''}</div>
           <div class="desc">${p.desc}</div>
-          <button class="btn-plan" id="btn-${p.key}"
-            onclick="choosePlan('${p.key}')">Start now</button>
+          <button class="btn-plano" id="btn-${p.key}"
+            onclick="escolherPlano('${p.key}')">Start now</button>
         </div>
       `).join('');
     }
  
-    async function choosePlan(plan) {
-      const btn = document.getElementById('btn-' + plan);
+    async function escolherPlano(plano) {
+      const btn = document.getElementById('btn-' + plano);
       btn.disabled = true;
       btn.textContent = 'Redirecting...';
  
@@ -140,7 +104,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json',
                      'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ plan: plan, cycle: cycle })
+          body: JSON.stringify({ plan: plano, cycle: ciclo })
         });
         const data = await res.json();
         if (data.url) { window.location.href = data.url; }
