@@ -818,6 +818,71 @@
         }
     </style>
 </head>
+    <!-- Adicionar antes do </body> no dashboard.html -->
+<div id="plano-status" style="background:white;border:1px solid #E3E8EF;
+  border-radius:14px;padding:24px 28px;margin-bottom:24px;"></div>
+ 
+<script>
+  const API_URL = 'https://SEU-BACKEND.railway.app'; // ← SUBSTITUI
+ 
+  async function carregarPlano() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+ 
+    try {
+      const res  = await fetch(API_URL + '/billing/status',
+        { headers: { Authorization: 'Bearer ' + token } });
+      const data = await res.json();
+      mostrarPlano(data);
+    } catch(e) { console.error(e); }
+  }
+ 
+  function mostrarPlano(d) {
+    const el   = document.getElementById('plano-status');
+    const dias = d.trialDaysLeft;
+    const isTrial   = d.status === 'trialing';
+    const isExpired = d.status === 'expired';
+    const isActive  = d.status === 'active';
+ 
+    const corBadge = isExpired ? "#D92D20" : isTrial ? "#F59E0B" : "#059669";
+    const nomePlano = { trial:'Trial Gratuito', essentials:'Essentials',
+                        compliance:'Compliance', business:'Business' }[d.plan] || d.plan;
+ 
+    // Montar HTML por partes para evitar template literals aninhadas
+    let html = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">';
+    html += '<div>';
+    html += '<span style="background:'+corBadge+'20;color:'+corBadge+';font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;text-transform:uppercase">'+nomePlano+'</span>';
+    if (isTrial && dias !== null) {
+      const txtDias = dias > 0 ? dias + ' dias restantes' : 'Expira hoje';
+      html += '<span style="color:#6B7280;font-size:13px;margin-left:10px">' + txtDias + '</span>';
+    }
+    if (isActive && d.periodEnd) {
+      html += '<span style="color:#9CA3AF;font-size:13px;margin-left:10px">Renova ' + new Date(d.periodEnd).toLocaleDateString("pt-PT") + '</span>';
+    }
+    html += '</div>';
+    if (isTrial || isExpired) {
+      const txtBtn = isExpired ? 'Reactivar' : 'Fazer Upgrade';
+      html += '<a href="/upgrade.html" style="background:#0052CC;color:white;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">' + txtBtn + ' →</a>';
+    }
+    if (isActive) {
+      html += '<button onclick="abrirPortal()" style="background:#F7F8FA;border:1px solid #E3E8EF;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">Gerir subscrição</button>';
+    }
+    html += '</div>';
+    if (isTrial && dias !== null) {
+      const pct = Math.min(100, (dias / 14) * 100);
+      const cor = dias <= 3 ? '#D92D20' : '#0052CC';
+      html += '<div style="height:6px;background:#F0F2F5;border-radius:100px;margin-top:14px;overflow:hidden"><div style="height:100%;border-radius:100px;width:'+pct+'%;background:'+cor+'"></div></div>';
+    }
+    el.innerHTML = html;
+  }
+ 
+  async function abrirPortal() {
+    const token = localStorage.getItem('token');
+    const res  = await fetch(API_URL + '/billing/portal',
+      { method:'POST', headers:{ Authorization:'Bearer '+token } });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  }
 <body>
 
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
