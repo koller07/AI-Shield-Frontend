@@ -4,69 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Shield — Stop Data Leaks to ChatGPT & AI Tools</title>
-<meta name="description" content="AI Shield monitors ChatGPT, Claude, Gemini and 25+ AI tools in real-time — blocking sensitive data before it leaves your organisation. GDPR & EU AI Act compliant. Install in 2 minutes.">
-<meta property="og:title" content="AI Shield — Stop Data Leaks to AI Tools">
-<meta property="og:description" content="Real-time protection against GDPR violations from AI tool usage. Trusted by European businesses. 14-day free trial.">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink:        #0D1117;
-  --ink-soft:   #3A4250;
-  --ink-muted:  #6B7280;
-  --surface:    #FFFFFF;
-  --surface-2:  #F7F8FA;
-  --surface-3:  #EEF1F5;
-  --accent:     #0052CC;
-  --accent-2:   #0040A8;
-  --accent-glow: rgba(0,82,204,0.12);
-  --danger:     #D92D20;
-  --success:    #12B76A;
-  --warning:    #F59E0B;
-  --border:     #E3E8EF;
-  --radius:     10px;
-  --radius-lg:  18px;
+  --ink: #0D1117;
+  --ink-soft: #3A4250;
+  --accent: #0052CC;
+  --border: #E3E8EF;
+  --radius: 10px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
-
 body {
   font-family: 'DM Sans', sans-serif;
-  background: var(--surface);
+  background: #FFFFFF;
   color: var(--ink);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* ─── TYPOGRAPHY ─── */
-h1, h2, h3, h4, .display { font-family: 'Syne', sans-serif; }
-
-.section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: var(--accent-glow);
-  padding: 5px 12px;
-  border-radius: 100px;
-  border: 1px solid rgba(0,82,204,0.2);
-  margin-bottom: 20px;
-}
-
-/* ─── LAYOUT ─── */
-.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-section { padding: 96px 0; }
-
-/* ─── NAV ─── */
+/* ─── NAV ADJUSTMENTS ─── */
 nav {
   position: sticky;
   top: 0;
@@ -75,106 +32,75 @@ nav {
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
+
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100px; /* Aumentado para acomodar a logo de 75px com respiro */
+  height: 100px; /* Altura aumentada para a logo de 75px */
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 24px;
 }
+
 .logo {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: var(--ink);
   font-family: 'Syne', sans-serif;
   font-weight: 700;
   font-size: 22px;
-  color: var(--ink);
-  text-decoration: none;
 }
-.logo-icon {
-  width: 75px; /* Alterado para 75px */
-  height: 75px; /* Alterado para 75px */
-  background: var(--accent);
-  border-radius: 12px; /* Ajuste leve no radius para o novo tamanho */
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+
+/* ─── LOGO IMAGE STYLE ─── */
+.logo-container {
+  width: 75px;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
-.logo-icon svg { width: 38px; height: 38px; fill: white; } /* Proporção do ícone interno ajustada */
+
+.logo-img {
+  width: 75px;  /* Tamanho exato solicitado */
+  height: 75px; /* Tamanho exato solicitado */
+  object-fit: contain; /* Garante que a imagem não distorça */
+}
 
 .nav-links {
   display: flex;
-  align-items: center;
   gap: 32px;
   list-style: none;
 }
+
 .nav-links a {
   font-size: 14px;
-  font-weight: 400;
-  color: var(--ink-soft);
   text-decoration: none;
-  transition: color .2s;
+  color: var(--ink-soft);
 }
-.nav-links a:hover { color: var(--ink); }
-.nav-actions { display: flex; align-items: center; gap: 12px; }
 
-/* ─── BUTTONS ─── */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'DM Sans', sans-serif;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-  border-radius: var(--radius);
-  padding: 10px 20px;
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-  transition: all .2s;
-  white-space: nowrap;
 }
-.btn-ghost {
-  background: transparent;
-  color: var(--ink-soft);
-  border: 1px solid var(--border);
-}
-.btn-ghost:hover { background: var(--surface-2); color: var(--ink); border-color: #c8cfd8; }
 
 .btn-primary {
   background: var(--accent);
   color: white;
-  box-shadow: 0 1px 3px rgba(0,82,204,.3), 0 4px 12px rgba(0,82,204,.18);
-}
-.btn-primary:hover {
-  background: var(--accent-2);
-  box-shadow: 0 2px 6px rgba(0,82,204,.35), 0 6px 20px rgba(0,82,204,.22);
-  transform: translateY(-1px);
 }
 
-/* O restante do seu CSS original continua aqui... */
-/* (Mantendo o código encurtado para o que não mudou) */
-
-/* ... (Hero, Mockup, Stats, Pricing etc permanecem iguais) ... */
-
-/* ─── FOOTER ─── */
-footer {
-  background: #0A0D14;
-  padding: 40px 0;
-  border-top: 1px solid rgba(255,255,255,.06);
+/* Reaplicando para o footer também */
+.footer-logo-img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
 }
-.footer-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-/* A logo do footer também usará a classe .logo-icon definida acima com 75px */
-.footer-logo { color: white; }
-
 </style>
 </head>
 <body>
@@ -182,19 +108,19 @@ footer {
 <nav>
   <div class="nav-inner">
     <a href="#" class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      <div class="logo-container">
+        <img src="logo_full.png" alt="AI Shield Logo" class="logo-img">
       </div>
       <span>AI Shield</span>
     </a>
+    
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
       <li><a href="#how">How it Works</a></li>
-      <li><a href="#compliance">Compliance</a></li>
       <li><a href="#pricing">Pricing</a></li>
     </ul>
+
     <div class="nav-actions">
-      <a href="#" class="btn btn-ghost">Log in</a>
       <a href="#" class="btn btn-primary">Start Free Trial</a>
     </div>
   </div>
