@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Shield — Compliance Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --ink:       #0D1117;
+  --ink-soft:  #1E2A3A;
+  --ink-mid:   #374151;
+  --muted:     #6B7280;
+  --accent:    #0052CC;
+  --accent-2:  #0040A8;
+  --accent-g:  rgba(0,82,204,.1);
+  --success:   #059669;
+  --success-g: rgba(5,150,105,.1);
+  --warning:   #D97706;
+  --warning-g: rgba(217,119,6,.1);
+  --danger:    #D92D20;
+  --danger-g:  rgba(217,45,32,.1);
+  --surface:   #FFFFFF;
+  --surface-2: #F7F8FA;
+  --border:    #E3E8EF;
+  --sidebar-w: 248px;
+  --header-h:  60px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--surface-2); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+.layout { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--ink);
+  position: fixed; height: 100vh;
+  display: flex; flex-direction: column; z-index: 200;
+}
+.sidebar-top {
+  height: var(--header-h); display: flex; align-items: center;
+  padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,.06); flex-shrink: 0;
+}
+.sidebar-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
+.sidebar-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); }
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-label { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.3); padding: 0 8px; margin: 16px 0 6px; }
+.nav-label:first-child { margin-top: 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 11px; padding: 9px 10px;
+  border-radius: 8px; margin-bottom: 2px; color: rgba(255,255,255,.55);
+  font-size: 13.5px; cursor: pointer; transition: all .15s;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.9); }
+.nav-item.active { background: rgba(0,82,204,.3); color: white; }
+.nav-icon { width: 16px; flex-shrink: 0; }
+.sidebar-bottom { padding: 14px 12px; border-top: 1px solid rgba(255,255,255,.06); flex-shrink: 0; }
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+  border-radius: 8px; background: rgba(255,255,255,.05); margin-bottom: 8px;
+}
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+.user-name { font-size: 13px; font-weight: 500; color: white; }
+.user-co   { font-size: 11px; color: rgba(255,255,255,.4); }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+.topbar {
+  height: var(--header-h); background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; position: sticky; top: 0; z-index: 100;
+}
+.page-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.live-badge {
+  display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
+  padding: 5px 12px; background: var(--success-g); color: var(--success);
+  border: 1px solid rgba(5,150,105,.2); border-radius: 100px;
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: livePulse 2s ease infinite; }
+@keyframes livePulse { 0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.4)}50%{box-shadow:0 0 0 4px rgba(5,150,105,0)} }
+.content { padding: 28px; }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── STATS GRID ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px;
+  transition: transform .2s, box-shadow .2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+.stat-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.stat-label { font-size: 11.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.stat-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+.stat-sub { font-size: 12px; color: var(--muted); }
+.stat-sub.up { color: var(--success); }
+.stat-sub.warn { color: var(--warning); }
+.stat-sub.danger { color: var(--danger); }
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 20px; }
+
+/* ── PANELS ── */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.panel-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+.panel-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 13px 14px; font-size: 13px; color: var(--ink-mid); border-bottom: 1px solid var(--surface-2); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface-2); }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.b-danger  { background: var(--danger-g);  color: var(--danger); }
+.b-warning { background: var(--warning-g); color: var(--warning); }
+.b-success { background: var(--success-g); color: var(--success); }
+.b-accent  { background: var(--accent-g);  color: var(--accent); }
+.b-muted   { background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); }
+
+/* ── PROGRESS ── */
+.progress-bar { height: 6px; background: var(--surface-2); border-radius: 100px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; border-radius: 100px; background: var(--accent); }
+
+/* ── TEAM CARDS ── */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 16px; }
+.team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: transform .2s, box-shadow .2s; }
+.team-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.07); }
+.team-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--surface-2); }
+.team-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: white; flex-shrink: 0; }
+.team-name { font-size: 14px; font-weight: 600; }
+.team-email { font-size: 12px; color: var(--muted); }
+.team-stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.team-stat { text-align: center; background: var(--surface-2); border-radius: 8px; padding: 10px; }
+.team-stat-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+.team-stat-lbl { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+/* ── COMPLIANCE SCORE ── */
+.score-ring { position: relative; width: 120px; height: 120px; margin: 0 auto 16px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--success); }
+.score-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+
+/* ── ALERT FEED ── */
+.alert-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--surface-2); }
+.alert-item:last-child { border-bottom: none; }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.alert-type { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.alert-meta { font-size: 12px; color: var(--muted); }
+.alert-time { font-size: 11.5px; color: var(--muted); margin-left: auto; flex-shrink: 0; white-space: nowrap; }
+
+/* ── COMPANY CODE BANNER ── */
+.code-banner {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.code-left { display: flex; align-items: center; gap: 14px; }
+.code-icon { width: 38px; height: 38px; background: var(--accent-g); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.code-lbl { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 3px; }
+.code-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); letter-spacing: .15em; }
+.copy-btn {
+  display: flex; align-items: center; gap: 6px; padding: 7px 16px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all .15s; color: var(--ink-mid); font-family: inherit;
+}
+.copy-btn:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { background: var(--success-g); border-color: rgba(5,150,105,.3); color: var(--success); }
+
+/* ── REPORT CARDS ── */
+.report-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.report-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 22px; cursor: pointer; transition: all .2s;
+}
+.report-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(0,82,204,.1); transform: translateY(-2px); }
+.report-icon { font-size: 28px; margin-bottom: 14px; }
+.report-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.report-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+.report-meta { font-size: 11.5px; color: var(--success); font-weight: 600; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--ink); color: white; padding: 12px 18px;
+  border-radius: 12px; font-size: 13px; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25); display: flex; align-items: center; gap: 9px;
+  transform: translateY(100px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--success); }
+
+/* ── COUNTER ANIMATION ── */
+.count-animate { transition: all .6s cubic-bezier(.34,1.56,.64,1); }
+
+@media (max-width: 1200px) { .stats-grid{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} }
+@media (max-width: 768px) { .sidebar{display:none} .main{margin-left:0} .content{padding:16px} }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a href="#" class="sidebar-logo">
+      <img src="https://www.getaishield.co/logo_full.png" alt="AI Shield"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+        style="height:36px;width:auto;">
+      <div style="display:none;align-items:center;gap:9px;">
+        <div style="width:28px;height:28px;background:#0052CC;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="white"><path d="M10 1L2 4.5v6C2 14.5 5.5 18.3 10 19c4.5-.7 8-4.5 8-8.5v-6L10 1zm-1 11.4L5.6 9l1.4-1.4 2 2 4-4L14.4 7 9 12.4z"/></svg>
+        </div>
+        <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:white;">AI Shield</span>
+      </div>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <button class="nav-item active" onclick="navigate('overview',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      Overview
+    </button>
+    <button class="nav-item" onclick="navigate('detections',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Detections
+    </button>
+    <button class="nav-item" onclick="navigate('team',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 13c0-2.8 2.2-5 5-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="11" cy="5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M14 12.5c0-2-1.3-3.5-3-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Team
+    </button>
+    <div class="nav-label">Compliance</div>
+    <button class="nav-item" onclick="navigate('reports',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Reports
+    </button>
+    <div class="nav-label">Account</div>
+    <button class="nav-item" onclick="navigate('billing',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M1 7h14" stroke="currentColor" stroke-width="1.3"/></svg>
+      Billing
+    </button>
+    <button class="nav-item" onclick="navigate('settings',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M2.9 2.9l1.1 1.1M12 12l1.1 1.1M13.1 2.9L12 4M4 12l-1.1 1.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Settings
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="user-avatar">AS</div>
+      <div>
+        <div class="user-name">Adam Smith</div>
+        <div class="user-co">Reachly Ltd — Compliance Plan</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <header class="topbar">
+    <span class="page-title" id="pageTitle">Overview</span>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;color:var(--muted)">April 2026</span>
+      <div class="live-badge"><div class="live-dot"></div> Live Monitoring</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="page active" id="page-overview">
+
+      <!-- Company Code -->
+      <div class="code-banner">
+        <div class="code-left">
+          <div class="code-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 5v5c0 4 3 7.5 7 8.5 4-1 7-4.5 7-8.5V5L10 2z" stroke="#0052CC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="code-lbl">Company Code — share with your team</div>
+            <div class="code-val">RCH7A2F4</div>
+          </div>
+        </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Copy code
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Total Detections</span>
+            <div class="stat-icon" style="background:var(--danger-g)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L1 14h14L8 2zm0 4v4M8 12v.5" stroke="#D92D20" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="s1" style="color:var(--danger)">843</div>
+          <div class="stat-sub warn">↑ 23% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Blocked</span>
+            <div class="stat-icon" style="background:var(--success-g)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 3.5v5C2 12.2 4.7 15 8 15.5c3.3-.5 6-3.3 6-7v-5L8 1z" stroke="#059669" stroke-width="1.3" fill="none"/><path d="M5.5 8l2 2 3-3" stroke="#059669" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" style="color:var(--success)">791</div>
+          <div class="stat-sub up">94% block rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Active Employees</span>
+            <div class="stat-icon" style="background:var(--accent-g)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="#0052CC" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#0052CC" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">24</div>
+          <div class="stat-sub">Across 4 departments</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid var(--success)">
+          <div class="stat-header">
+            <span class="stat-label">Fines Mitigated</span>
+            <div class="stat-icon" style="background:var(--success-g)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#059669" stroke-width="1.3"/><path d="M8 4v2M8 6c-1.1 0-2 .7-2 1.5s.9 1.5 2 1.5 2 .7 2 1.5S9.1 12 8 12M8 12v1" stroke="#059669" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" style="color:var(--success);font-size:26px">€42.1M</div>
+          <div class="stat-sub up">Based on GDPR Art. 83</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Detection volume — last 30 days</span>
+            <span class="badge b-accent">April 2026</span>
+          </div>
+          <canvas id="trendChart" height="110"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Risk by platform</span>
+          </div>
+          <canvas id="platformChart" height="110"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent + Top types -->
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Recent detections</span>
+            <button onclick="navigate('detections',null)" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:500">View all →</button>
+          </div>
+          <div id="recentFeed"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Top data types</span>
+          </div>
+          <div id="topTypes"></div>
+
+          <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--border)">
+            <div class="panel-title" style="margin-bottom:14px">GDPR Compliance Score</div>
+            <div class="score-ring">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#E3E8EF" stroke-width="10"/>
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#059669" stroke-width="10"
+                  stroke-dasharray="314" stroke-dashoffset="47" stroke-linecap="round"/>
+              </svg>
+              <div class="score-text">
+                <div class="score-num">85%</div>
+                <div class="score-lbl">Compliant</div>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);text-align:center">Art. 32 — Technical measures documented</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DETECTIONS ══ -->
+    <div class="page" id="page-detections">
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+        <select style="padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;background:white" onchange="filterTable(this.value,'type')">
+          <option value="">All data types</option>
+          <option>IBAN</option><option>CREDIT_CARD</option><option>EMAIL</option>
+          <option>API_KEY</option><option>NIF</option><option>PHONE</option>
+        </select>
+        <select style="padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;background:white" onchange="filterTable(this.value,'platform')">
+          <option value="">All platforms</option>
+          <option>ChatGPT</option><option>Claude</option><option>Gemini</option><option>Copilot</option>
+        </select>
+        <select style="padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;background:white" onchange="filterTable(this.value,'action')">
+          <option value="">All actions</option>
+          <option>Blocked</option><option>Sent anyway</option>
+        </select>
+        <div style="margin-left:auto">
+          <button onclick="showToast('CSV exported — 843 rows','success')" style="padding:8px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500">↓ Export CSV</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:0">
+        <div class="panel-header">
+          <span class="panel-title"><span id="detCount">843</span> detections — April 2026</span>
+          <input type="text" placeholder="Search…" oninput="searchTable(this.value)"
+            style="padding:6px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;width:200px;">
+        </div>
+        <div class="table-wrap">
+          <table id="detectionsTable">
+            <thead><tr>
+              <th>Employee</th><th>Data Type</th><th>Platform</th>
+              <th>Action</th><th>Date & Time</th>
+            </tr></thead>
+            <tbody id="detTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TEAM ══ -->
+    <div class="page" id="page-team">
+      <div style="margin-bottom:20px">
+        <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Team members</h2>
+        <p style="font-size:13px;color:var(--muted)">24 employees registered via Company Code RCH7A2F4</p>
+      </div>
+      <div class="team-grid" id="teamGrid"></div>
+    </div>
+
+    <!-- ══ REPORTS ══ -->
+    <div class="page" id="page-reports">
+      <div class="grid-2" style="margin-bottom:20px">
+        <div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Compliance Reports</h2>
+          <p style="font-size:13px;color:var(--muted)">GDPR Art. 32 documentation — ready to submit to your DPA</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+          <button onclick="showToast('PDF report generated','success')" style="padding:9px 18px;background:var(--accent);color:white;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">↓ Export PDF</button>
+          <button onclick="showToast('CSV exported','success')" style="padding:9px 18px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">↓ CSV</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Total Events</div><div class="stat-value">843</div></div>
+        <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Blocked</div><div class="stat-value" style="color:var(--success)">791</div></div>
+        <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Employees</div><div class="stat-value">24</div></div>
+        <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Fines Prevented</div><div class="stat-value" style="font-size:22px;color:var(--success)">€42.1M</div></div>
+      </div>
+
+      <div class="report-grid">
+        <div class="report-card" onclick="showToast('GDPR Art. 32 report opened','success')">
+          <div class="report-icon">📋</div>
+          <div class="report-title">GDPR Article 32 Report</div>
+          <div class="report-desc">Technical measures documentation for your Data Protection Authority. Includes all detections, timestamps, and employee actions.</div>
+          <div class="report-meta">✓ April 2026 · 843 events · Ready to submit</div>
+        </div>
+        <div class="report-card" onclick="showToast('EU AI Act report opened','success')">
+          <div class="report-icon">🇪🇺</div>
+          <div class="report-title">EU AI Act Compliance Report</div>
+          <div class="report-desc">Article 28 deployer obligations — documented AI usage controls across ChatGPT, Claude, Gemini and 22 other platforms.</div>
+          <div class="report-meta">✓ Deadline: August 2026 · 25 platforms covered</div>
+        </div>
+        <div class="report-card" onclick="showToast('Audit trail exported','success')">
+          <div class="report-icon">🔍</div>
+          <div class="report-title">Full Audit Trail</div>
+          <div class="report-desc">Complete log of every detection with employee email, platform, data type, action taken, and timestamp.</div>
+          <div class="report-meta">✓ 12-month retention · Exportable CSV / PDF</div>
+        </div>
+        <div class="report-card" onclick="showToast('Employee coaching report opened','success')">
+          <div class="report-icon">👥</div>
+          <div class="report-title">Employee Coaching Report</div>
+          <div class="report-desc">Per-employee breakdown of detections and coaching effectiveness. Identifies repeat offenders and training needs.</div>
+          <div class="report-meta">✓ 24 employees · 3 require follow-up</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BILLING ══ -->
+    <div class="page" id="page-billing">
+      <div class="panel" style="margin-bottom:24px">
+        <div class="panel-header"><span class="panel-title">Current plan</span></div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Plan</div><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800">Compliance</div></div>
+          <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Status</div><span class="badge b-success">Active</span></div>
+          <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Users</div><div style="font-size:14px;font-weight:500">24 / 30</div></div>
+          <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Next renewal</div><div style="font-size:14px;font-weight:500">1 May 2026</div></div>
+          <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Amount</div><div style="font-size:14px;font-weight:500">€99/month</div></div>
+          <button onclick="showToast('Opening billing portal…','')" style="margin-left:auto;padding:9px 18px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Manage billing →</button>
+        </div>
+      </div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px">Upgrade to Business</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Get SSO, API access, white-label reports and a dedicated account manager.</p>
+      <div style="background:var(--ink);border-radius:14px;padding:28px;max-width:460px">
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:white;margin-bottom:4px">Business Plan</div>
+        <div style="display:flex;align-items:baseline;gap:3px;margin:12px 0 4px"><span style="font-size:16px;font-weight:600;color:white">€</span><span style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:white;line-height:1">249</span><span style="font-size:12px;color:rgba(255,255,255,.5)">/month</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:20px">Up to 75 users</div>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin-bottom:16px"></div>
+        <div style="font-size:13px;color:rgba(255,255,255,.8);display:flex;flex-direction:column;gap:9px;margin-bottom:20px">
+          <div>✓ Everything in Compliance</div>
+          <div>✓ SSO / SAML integration</div>
+          <div>✓ Full API access</div>
+          <div>✓ White-label reports</div>
+          <div>✓ Dedicated account manager</div>
+        </div>
+        <button onclick="showToast('Redirecting to Stripe checkout…','')" style="width:100%;padding:12px;background:white;color:#0052CC;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Upgrade to Business →</button>
+      </div>
+    </div>
+
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="page" id="page-settings">
+
+      <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;background:var(--accent-g);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="3" stroke="#0052CC" stroke-width="1.3"/><path d="M5 8h6M8 5v6" stroke="#0052CC" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700">Company information</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div><label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Company name</label><input value="Reachly Ltd" style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13.5px;font-family:inherit;outline:none"></div>
+          <div><label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Admin email</label><input value="a.smith@reachly.co.uk" style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13.5px;font-family:inherit;outline:none"></div>
+          <div><label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Industry</label><select style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13.5px;font-family:inherit;background:white;outline:none"><option>Technology</option><option selected>Finance</option><option>Legal</option><option>Healthcare</option></select></div>
+          <div><label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Company Code (read-only)</label><input value="RCH7A2F4" readonly style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13.5px;font-family:'Syne',sans-serif;font-weight:800;color:#0052CC;letter-spacing:.12em;background:var(--surface-2);outline:none;cursor:default"></div>
+        </div>
+        <button onclick="showToast('Company settings saved','success')" style="padding:9px 20px;background:#0052CC;color:white;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Save changes</button>
+      </div>
+
+      <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;background:var(--success-g);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 3.5v5C2 12.2 4.7 15 8 15.5c3.3-.5 6-3.3 6-7v-5L8 1z" stroke="#059669" stroke-width="1.3" fill="none"/></svg></div>
+          <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700">Detection policies</span>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--surface-2)"><div><div style="font-size:13.5px;font-weight:500;margin-bottom:2px">Alert employees in real-time</div><div style="font-size:12px;color:var(--muted)">Show popup when sensitive data is detected</div></div><div style="width:38px;height:22px;background:#0052CC;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0" onclick="this.style.background=this.dataset.on==='1'?'#6B7280':'#0052CC';this.dataset.on=this.dataset.on==='1'?'0':'1';this.querySelector('span').style.transform=this.dataset.on==='1'?'translateX(16px)':'translateX(0)';showToast('Policy updated','success')" data-on="1"><span style="position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s;transform:translateX(16px)"></span></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--surface-2)"><div><div style="font-size:13.5px;font-weight:500;margin-bottom:2px">Log all detections to dashboard</div><div style="font-size:12px;color:var(--muted)">Send every detection to compliance dashboard</div></div><div style="width:38px;height:22px;background:#0052CC;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0" onclick="this.style.background=this.dataset.on==='1'?'#6B7280':'#0052CC';this.dataset.on=this.dataset.on==='1'?'0':'1';this.querySelector('span').style.transform=this.dataset.on==='1'?'translateX(16px)':'translateX(0)';showToast('Policy updated','success')" data-on="1"><span style="position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s;transform:translateX(16px)"></span></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--surface-2)"><div><div style="font-size:13.5px;font-weight:500;margin-bottom:2px">Monthly compliance reports</div><div style="font-size:12px;color:var(--muted)">Auto-send GDPR report on 1st of each month</div></div><div style="width:38px;height:22px;background:#0052CC;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0" onclick="this.style.background=this.dataset.on==='1'?'#6B7280':'#0052CC';this.dataset.on=this.dataset.on==='1'?'0':'1';this.querySelector('span').style.transform=this.dataset.on==='1'?'translateX(16px)':'translateX(0)';showToast('Policy updated','success')" data-on="1"><span style="position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s;transform:translateX(16px)"></span></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><div><div style="font-size:13.5px;font-weight:500;margin-bottom:2px">Weekly digest</div><div style="font-size:12px;color:var(--muted)">Receive weekly summary by email</div></div><div style="width:38px;height:22px;background:#6B7280;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0" onclick="this.style.background=this.dataset.on==='1'?'#6B7280':'#0052CC';this.dataset.on=this.dataset.on==='1'?'0':'1';this.querySelector('span').style.transform=this.dataset.on==='1'?'translateX(16px)':'translateX(0)';showToast('Policy updated','success')" data-on="0"><span style="position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s"></span></div></div>
+        </div>
+      </div>
+
+      <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;background:var(--accent-g);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="#0052CC" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#0052CC" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700">Account</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div><label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">New password</label><input type="password" placeholder="Leave blank to keep current" style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13.5px;font-family:inherit;outline:none"></div>
+          <div><label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Confirm password</label><input type="password" placeholder="Repeat new password" style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13.5px;font-family:inherit;outline:none"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="showToast('Password updated','success')" style="padding:9px 20px;background:#0052CC;color:white;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Update password</button>
+          <button onclick="showToast('Signed out','');setTimeout(()=>location.reload(),1200)" style="padding:9px 20px;background:rgba(217,45,32,.08);color:#D92D20;border:1px solid rgba(217,45,32,.2);border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Sign out</button>
+        </div>
+      </div>
+
+    </div><!-- /settings -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Demo Data ──────────────────────────────────────────────
+const EMPLOYEES = [
+  { name:'Adam Smith',    email:'a.smith@reachly.co.uk',    dept:'Legal',      color:'#0052CC', detections:142, blocked:138 },
+  { name:'James Whitfield', email:'j.whitfield@reachly.co.uk', dept:'Finance',    color:'#059669', detections:98,  blocked:91  },
+  { name:'Priya Sharma',    email:'p.sharma@reachly.co.uk',    dept:'HR',         color:'#7C3AED', detections:87,  blocked:84  },
+  { name:'Marcus Chen',     email:'m.chen@reachly.co.uk',      dept:'Engineering',color:'#D97706', detections:76,  blocked:71  },
+  { name:'Emma Fitzgerald', email:'e.fitzgerald@reachly.co.uk',dept:'Marketing',  color:'#D92D20', detections:64,  blocked:62  },
+  { name:'Oliver Banks',    email:'o.banks@reachly.co.uk',     dept:'Finance',    color:'#059669', detections:58,  blocked:55  },
+  { name:'Yasmin Al-Rashid',email:'y.alrashid@reachly.co.uk',  dept:'Legal',      color:'#0052CC', detections:51,  blocked:50  },
+  { name:'Tom Hartley',     email:'t.hartley@reachly.co.uk',   dept:'Engineering',color:'#D97706', detections:44,  blocked:42  },
+  { name:'Nina Becker',     email:'n.becker@reachly.co.uk',    dept:'HR',         color:'#7C3AED', detections:39,  blocked:38  },
+  { name:'Raj Patel',       email:'r.patel@reachly.co.uk',     dept:'Marketing',  color:'#D92D20', detections:32,  blocked:31  },
+];
+
+const DETECTIONS_DATA = [
+  { employee:'Adam Smith',    type:'IBAN',        platform:'ChatGPT', action:'removed',  time:'Today, 14:32' },
+  { employee:'James Whitfield', type:'CREDIT_CARD', platform:'Claude',  action:'removed',  time:'Today, 13:18' },
+  { employee:'Priya Sharma',    type:'EMAIL',       platform:'Gemini',  action:'ignored',  time:'Today, 12:05' },
+  { employee:'Marcus Chen',     type:'API_KEY',     platform:'Copilot', action:'removed',  time:'Today, 11:47' },
+  { employee:'Emma Fitzgerald', type:'IBAN',        platform:'ChatGPT', action:'removed',  time:'Today, 10:33' },
+  { employee:'Oliver Banks',    type:'NIF',         platform:'Claude',  action:'removed',  time:'Today, 09:51' },
+  { employee:'Yasmin Al-Rashid',type:'CREDIT_CARD', platform:'ChatGPT', action:'removed',  time:'Yesterday, 17:22' },
+  { employee:'Tom Hartley',     type:'API_KEY',     platform:'Copilot', action:'ignored',  time:'Yesterday, 16:45' },
+  { employee:'Nina Becker',     type:'EMAIL',       platform:'Gemini',  action:'removed',  time:'Yesterday, 15:30' },
+  { employee:'Raj Patel',       type:'PHONE',       platform:'ChatGPT', action:'removed',  time:'Yesterday, 14:12' },
+  { employee:'Adam Smith',    type:'IBAN',        platform:'Claude',  action:'removed',  time:'Yesterday, 13:08' },
+  { employee:'James Whitfield', type:'CREDIT_CARD', platform:'ChatGPT', action:'removed',  time:'Yesterday, 11:55' },
+  { employee:'Priya Sharma',    type:'NIF',         platform:'Gemini',  action:'ignored',  time:'26 Apr, 16:30' },
+  { employee:'Marcus Chen',     type:'API_KEY',     platform:'Copilot', action:'removed',  time:'26 Apr, 15:15' },
+  { employee:'Emma Fitzgerald', type:'IBAN',        platform:'ChatGPT', action:'removed',  time:'26 Apr, 14:02' },
+];
+
+let filteredData = [...DETECTIONS_DATA];
+
+// ── Navigation ─────────────────────────────────────────────
+function navigate(page, btn) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(el => {
+    if (el.textContent.trim().toLowerCase().includes(page)) el.classList.add('active');
+  });
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const titles = { overview:'Overview', detections:'Detections', team:'Team', reports:'Reports', billing:'Billing', settings:'Settings' };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+}
+
+// ── Charts ─────────────────────────────────────────────────
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+new Chart(trendCtx, {
+  type: 'line',
+  data: {
+    labels: ['Apr 1','Apr 5','Apr 8','Apr 11','Apr 14','Apr 17','Apr 20','Apr 23','Apr 26','Apr 28'],
+    datasets: [{
+      label: 'Detections',
+      data: [22, 31, 28, 45, 38, 52, 41, 67, 58, 72],
+      borderColor: '#0052CC', backgroundColor: 'rgba(0,82,204,.08)',
+      fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#0052CC',
+    },{
+      label: 'Blocked',
+      data: [21, 29, 27, 43, 36, 50, 39, 63, 55, 68],
+      borderColor: '#059669', backgroundColor: 'transparent',
+      borderDash: [4,4], tension: 0.4, pointRadius: 3, pointBackgroundColor: '#059669',
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position:'top', labels:{ usePointStyle:true, boxWidth:8, font:{size:11} } } },
+    scales: {
+      y: { beginAtZero:true, grid:{ color:'#F0F2F5' }, ticks:{ font:{size:11} } },
+      x: { grid:{ display:false }, ticks:{ font:{size:11} } }
+    }
+  }
+});
+
+const platformCtx = document.getElementById('platformChart').getContext('2d');
+new Chart(platformCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['ChatGPT','Claude','Copilot','Gemini','Others'],
+    datasets:[{ data:[38,24,18,14,6], backgroundColor:['#10A37F','#CC785C','#6450DC','#4285F4','#9CA3AF'], borderWidth:0 }]
+  },
+  options: {
+    responsive:true, cutout:'72%',
+    plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, padding:14, font:{size:11} } } }
+  }
+});
+
+// ── Recent Feed ────────────────────────────────────────────
+const colors = { IBAN:'#D92D20', CREDIT_CARD:'#D92D20', API_KEY:'#7C3AED', EMAIL:'#D97706', NIF:'#0052CC', PHONE:'#059669' };
+document.getElementById('recentFeed').innerHTML = DETECTIONS_DATA.slice(0,7).map(d => `
+  <div class="alert-item">
+    <div class="alert-dot" style="background:${colors[d.type]||'#6B7280'}"></div>
+    <div style="flex:1;min-width:0">
+      <div class="alert-type">${d.type.replace('_',' ')}</div>
+      <div class="alert-meta">${d.employee} · ${d.platform}</div>
+    </div>
+    <div class="alert-time">${d.time}</div>
+  </div>
+`).join('');
+
+// ── Top Types ──────────────────────────────────────────────
+const typeCounts = DETECTIONS_DATA.reduce((a,d) => { a[d.type]=(a[d.type]||0)+1; return a; }, {});
+const sortedTypes = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
+const maxCount = sortedTypes[0][1];
+document.getElementById('topTypes').innerHTML = sortedTypes.map(([type, count]) => `
+  <div style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:13px;font-weight:500">${type.replace('_',' ')}</span>
+      <span style="font-size:12px;color:var(--muted)">${count * 56}</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${Math.round((count/maxCount)*100)}%"></div></div>
+  </div>
+`).join('');
+
+// ── Detections Table ───────────────────────────────────────
+function renderTable(data) {
+  document.getElementById('detCount').textContent = data.length;
+  const sevMap = { IBAN:'b-danger', CREDIT_CARD:'b-danger', API_KEY:'b-danger', EMAIL:'b-warning', NIF:'b-accent', PHONE:'b-muted' };
+  document.getElementById('detTableBody').innerHTML = data.map(d => `
+    <tr>
+      <td><strong>${d.employee}</strong></td>
+      <td><span class="badge ${sevMap[d.type]||'b-muted'}">${d.type.replace('_',' ')}</span></td>
+      <td>${d.platform}</td>
+      <td><span class="badge ${d.action==='removed'?'b-success':'b-warning'}">${d.action==='removed'?'Blocked':'Sent anyway'}</span></td>
+      <td>${d.time}</td>
+    </tr>
+  `).join('');
+}
+renderTable(DETECTIONS_DATA);
+
+function filterTable(val, field) {
+  filteredData = DETECTIONS_DATA.filter(d => {
+    if (field === 'type')     return !val || d.type === val;
+    if (field === 'platform') return !val || d.platform === val;
+    if (field === 'action')   return !val || (val==='Blocked'?d.action==='removed':d.action==='ignored');
+    return true;
+  });
+  renderTable(filteredData);
+}
+
+function searchTable(q) {
+  const lq = q.toLowerCase();
+  const data = lq ? DETECTIONS_DATA.filter(d =>
+    d.employee.toLowerCase().includes(lq) || d.type.toLowerCase().includes(lq) || d.platform.toLowerCase().includes(lq)
+  ) : DETECTIONS_DATA;
+  renderTable(data);
+}
+
+// ── Team Grid ──────────────────────────────────────────────
+document.getElementById('teamGrid').innerHTML = EMPLOYEES.map(e => {
+  const initials = e.name.split(' ').map(w=>w[0]).join('');
+  return `
+    <div class="team-card">
+      <div class="team-card-header">
+        <div class="team-avatar" style="background:${e.color}">${initials}</div>
+        <div>
+          <div class="team-name">${e.name}</div>
+          <div class="team-email">${e.email}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${e.dept}</div>
+        </div>
+      </div>
+      <div class="team-stats-row">
+        <div class="team-stat">
+          <div class="team-stat-val" style="color:var(--danger)">${e.detections}</div>
+          <div class="team-stat-lbl">Detected</div>
+        </div>
+        <div class="team-stat">
+          <div class="team-stat-val" style="color:var(--success)">${e.blocked}</div>
+          <div class="team-stat-lbl">Blocked</div>
+        </div>
+      </div>
+    </div>
+  `;
+}).join('');
+
+// ── Copy Code ──────────────────────────────────────────────
+function copyCode() {
+  navigator.clipboard.writeText('RCH7A2F4').then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3 3 6-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Copy code`;
+    }, 2000);
+    showToast('Company Code copied!', 'success');
+  });
+}
+
+// ── Toast ──────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type||''}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
