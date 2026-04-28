@@ -317,13 +317,13 @@ tr:hover td { background: var(--surface-2); }
         </div>
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-label">Blocked</span>
+            <span class="stat-label">Detected</span>
             <div class="stat-icon" style="background:var(--success-g)">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 3.5v5C2 12.2 4.7 15 8 15.5c3.3-.5 6-3.3 6-7v-5L8 1z" stroke="#059669" stroke-width="1.3" fill="none"/><path d="M5.5 8l2 2 3-3" stroke="#059669" stroke-width="1.3" stroke-linecap="round"/></svg>
             </div>
           </div>
-          <div class="stat-value" style="color:var(--success)">791</div>
-          <div class="stat-sub up">94% block rate</div>
+          <div class="stat-value" style="color:var(--accent)">843</div>
+          <div class="stat-sub up">100% notified</div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
@@ -360,7 +360,7 @@ tr:hover td { background: var(--surface-2); }
           <div class="panel-header">
             <span class="panel-title">Risk by platform</span>
           </div>
-          <canvas id="platformChart" height="110"></canvas>
+          <canvas id="platformChart" height="160" style="max-height:160px"></canvas>
         </div>
       </div>
 
@@ -381,15 +381,15 @@ tr:hover td { background: var(--surface-2); }
 
           <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--border)">
             <div class="panel-title" style="margin-bottom:14px">GDPR Compliance Score</div>
-            <div class="score-ring">
-              <svg width="120" height="120" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#E3E8EF" stroke-width="10"/>
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#059669" stroke-width="10"
-                  stroke-dasharray="314" stroke-dashoffset="47" stroke-linecap="round"/>
+            <div class="score-ring" style="width:80px;height:80px">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#E3E8EF" stroke-width="7"/>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#059669" stroke-width="7"
+                  stroke-dasharray="201" stroke-dashoffset="30" stroke-linecap="round"/>
               </svg>
               <div class="score-text">
-                <div class="score-num">85%</div>
-                <div class="score-lbl">Compliant</div>
+                <div class="score-num" style="font-size:16px;line-height:1">85%</div>
+                <div class="score-lbl" style="font-size:8px">Compliant</div>
               </div>
             </div>
             <div style="font-size:12px;color:var(--muted);text-align:center">Art. 32 — Technical measures documented</div>
@@ -412,7 +412,7 @@ tr:hover td { background: var(--surface-2); }
         </select>
         <select style="padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;background:white" onchange="filterTable(this.value,'action')">
           <option value="">All actions</option>
-          <option>Blocked</option><option>Sent anyway</option>
+          <option value='detected'>Detected</option><option value='sent'>Sent anyway</option>
         </select>
         <div style="margin-left:auto">
           <button onclick="showToast('CSV exported — 843 rows','success')" style="padding:8px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500">↓ Export CSV</button>
@@ -461,7 +461,7 @@ tr:hover td { background: var(--surface-2); }
       <!-- Stats -->
       <div class="stats-grid" style="margin-bottom:20px">
         <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Total Events</div><div class="stat-value">843</div></div>
-        <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Blocked</div><div class="stat-value" style="color:var(--success)">791</div></div>
+        <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Notified</div><div class="stat-value" style="color:var(--accent)">843</div></div>
         <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Employees</div><div class="stat-value">24</div></div>
         <div class="stat-card"><div class="stat-label" style="margin-bottom:8px">Fines Prevented</div><div class="stat-value" style="font-size:22px;color:var(--success)">€42.1M</div></div>
       </div>
@@ -471,7 +471,7 @@ tr:hover td { background: var(--surface-2); }
           <div class="report-icon">📋</div>
           <div class="report-title">GDPR Article 32 Report</div>
           <div class="report-desc">Technical measures documentation for your Data Protection Authority. Includes all detections, timestamps, and employee actions.</div>
-          <div class="report-meta">✓ April 2026 · 843 events · Ready to submit</div>
+          <div class="report-meta">✓ April 2026 · 843 notifications · Ready to submit</div>
         </div>
         <div class="report-card" onclick="showToast('EU AI Act report opened','success')">
           <div class="report-icon">🇪🇺</div>
@@ -595,21 +595,21 @@ const EMPLOYEES = [
 ];
 
 const DETECTIONS_DATA = [
-  { employee:'Adam Smith',    type:'IBAN',        platform:'ChatGPT', action:'removed',  time:'Today, 14:32' },
-  { employee:'James Whitfield', type:'CREDIT_CARD', platform:'Claude',  action:'removed',  time:'Today, 13:18' },
-  { employee:'Priya Sharma',    type:'EMAIL',       platform:'Gemini',  action:'ignored',  time:'Today, 12:05' },
-  { employee:'Marcus Chen',     type:'API_KEY',     platform:'Copilot', action:'removed',  time:'Today, 11:47' },
-  { employee:'Emma Fitzgerald', type:'IBAN',        platform:'ChatGPT', action:'removed',  time:'Today, 10:33' },
-  { employee:'Oliver Banks',    type:'NIF',         platform:'Claude',  action:'removed',  time:'Today, 09:51' },
-  { employee:'Yasmin Al-Rashid',type:'CREDIT_CARD', platform:'ChatGPT', action:'removed',  time:'Yesterday, 17:22' },
-  { employee:'Tom Hartley',     type:'API_KEY',     platform:'Copilot', action:'ignored',  time:'Yesterday, 16:45' },
-  { employee:'Nina Becker',     type:'EMAIL',       platform:'Gemini',  action:'removed',  time:'Yesterday, 15:30' },
-  { employee:'Raj Patel',       type:'PHONE',       platform:'ChatGPT', action:'removed',  time:'Yesterday, 14:12' },
-  { employee:'Adam Smith',    type:'IBAN',        platform:'Claude',  action:'removed',  time:'Yesterday, 13:08' },
-  { employee:'James Whitfield', type:'CREDIT_CARD', platform:'ChatGPT', action:'removed',  time:'Yesterday, 11:55' },
-  { employee:'Priya Sharma',    type:'NIF',         platform:'Gemini',  action:'ignored',  time:'26 Apr, 16:30' },
-  { employee:'Marcus Chen',     type:'API_KEY',     platform:'Copilot', action:'removed',  time:'26 Apr, 15:15' },
-  { employee:'Emma Fitzgerald', type:'IBAN',        platform:'ChatGPT', action:'removed',  time:'26 Apr, 14:02' },
+  { employee:'Adam Smith',    type:'IBAN',        platform:'ChatGPT', action:'detected',  time:'Today, 14:32' },
+  { employee:'James Whitfield', type:'CREDIT_CARD', platform:'Claude',  action:'detected',  time:'Today, 13:18' },
+  { employee:'Priya Sharma',    type:'EMAIL',       platform:'Gemini',  action:'sent',      time:'Today, 12:05' },
+  { employee:'Marcus Chen',     type:'API_KEY',     platform:'Copilot', action:'detected',  time:'Today, 11:47' },
+  { employee:'Emma Fitzgerald', type:'IBAN',        platform:'ChatGPT', action:'detected',  time:'Today, 10:33' },
+  { employee:'Oliver Banks',    type:'NIF',         platform:'Claude',  action:'detected',  time:'Today, 09:51' },
+  { employee:'Yasmin Al-Rashid',type:'CREDIT_CARD', platform:'ChatGPT', action:'detected',  time:'Yesterday, 17:22' },
+  { employee:'Tom Hartley',     type:'API_KEY',     platform:'Copilot', action:'sent',      time:'Yesterday, 16:45' },
+  { employee:'Nina Becker',     type:'EMAIL',       platform:'Gemini',  action:'detected',  time:'Yesterday, 15:30' },
+  { employee:'Raj Patel',       type:'PHONE',       platform:'ChatGPT', action:'detected',  time:'Yesterday, 14:12' },
+  { employee:'Adam Smith',    type:'IBAN',        platform:'Claude',  action:'detected',  time:'Yesterday, 13:08' },
+  { employee:'James Whitfield', type:'CREDIT_CARD', platform:'ChatGPT', action:'sent',      time:'Yesterday, 11:55' },
+  { employee:'Priya Sharma',    type:'NIF',         platform:'Gemini',  action:'detected',  time:'26 Apr, 16:30' },
+  { employee:'Marcus Chen',     type:'API_KEY',     platform:'Copilot', action:'detected',  time:'26 Apr, 15:15' },
+  { employee:'Emma Fitzgerald', type:'IBAN',        platform:'ChatGPT', action:'sent',      time:'26 Apr, 14:02' },
 ];
 
 let filteredData = [...DETECTIONS_DATA];
@@ -639,9 +639,9 @@ new Chart(trendCtx, {
       borderColor: '#0052CC', backgroundColor: 'rgba(0,82,204,.08)',
       fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#0052CC',
     },{
-      label: 'Blocked',
+      label: 'Notified',
       data: [21, 29, 27, 43, 36, 50, 39, 63, 55, 68],
-      borderColor: '#059669', backgroundColor: 'transparent',
+      borderColor: '#60A5FA', backgroundColor: 'transparent',
       borderDash: [4,4], tension: 0.4, pointRadius: 3, pointBackgroundColor: '#059669',
     }]
   },
@@ -704,7 +704,7 @@ function renderTable(data) {
       <td><strong>${d.employee}</strong></td>
       <td><span class="badge ${sevMap[d.type]||'b-muted'}">${d.type.replace('_',' ')}</span></td>
       <td>${d.platform}</td>
-      <td><span class="badge ${d.action==='removed'?'b-success':'b-warning'}">${d.action==='removed'?'Blocked':'Sent anyway'}</span></td>
+      <td><span class="badge ${d.action==='detected'?'b-success':'b-warning'}">${d.action==='detected'?'Detected':'Sent anyway'}</span></td>
       <td>${d.time}</td>
     </tr>
   `).join('');
@@ -715,7 +715,7 @@ function filterTable(val, field) {
   filteredData = DETECTIONS_DATA.filter(d => {
     if (field === 'type')     return !val || d.type === val;
     if (field === 'platform') return !val || d.platform === val;
-    if (field === 'action')   return !val || (val==='Blocked'?d.action==='removed':d.action==='ignored');
+    if (field === 'action')   return !val || d.action === val;
     return true;
   });
   renderTable(filteredData);
@@ -744,12 +744,12 @@ document.getElementById('teamGrid').innerHTML = EMPLOYEES.map(e => {
       </div>
       <div class="team-stats-row">
         <div class="team-stat">
-          <div class="team-stat-val" style="color:var(--danger)">${e.detections}</div>
+          <div class="team-stat-val" style="color:var(--success)">${e.detections}</div>
           <div class="team-stat-lbl">Detected</div>
         </div>
         <div class="team-stat">
-          <div class="team-stat-val" style="color:var(--success)">${e.blocked}</div>
-          <div class="team-stat-lbl">Blocked</div>
+          <div class="team-stat-val" style="color:var(--warning)">${Math.round(e.detections * 0.2)}</div>
+          <div class="team-stat-lbl">Sent anyway</div>
         </div>
       </div>
     </div>
