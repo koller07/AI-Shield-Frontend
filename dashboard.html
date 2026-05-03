@@ -1456,8 +1456,8 @@ async function loadTeam() {
           <div class="team-card-header">
             <div class="team-avatar" style="background:${color}">${initials}</div>
             <div>
-              <div class="team-name">${escapeHtml(m.name)}</div>
-              <div class="team-email">${escapeHtml(m.email)}</div>
+              <div class="team-name">${(m.name || '').replace(/[<>&"']/g, '')}</div>
+              <div class="team-email">${(m.email || '').replace(/[<>&"']/g, '')}</div>
             </div>
           </div>
           <div class="team-stats-row">
