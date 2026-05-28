@@ -1158,18 +1158,22 @@ async function init() {
     document.getElementById('det-month').value = m;
     document.getElementById('rep-month').value = m;
 
-    // Check welcome redirect
+     // Check welcome redirect
     if (window.location.search.includes('welcome=true')) {
       showToast('Welcome to AI Shield! 🎉 Share your Company Code with your team.', 'success');
       history.replaceState({}, '', 'dashboard.html');
     }
-
+    // Deep linking: read hash and navigate to that tab
+    const hash = window.location.hash.replace('#', '');
+    const validPages = ['overview', 'detections', 'team', 'reports', 'billing', 'settings'];
+    if (hash && validPages.includes(hash)) {
+      navigate(hash);
+    }
   } catch (err) {
     console.error('Init error:', err);
     showToast('Failed to load dashboard data', 'error');
   }
 }
-
 // ── Trial Banner ──────────────────────────────────────────────
 function renderTrialBanner() {
   if (!subData) return;
@@ -1951,17 +1955,17 @@ async function navigate(page) {
   // Update nav
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById(`nav-${page}`)?.classList.add('active');
-
   // Update pages
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.getElementById(`page-${page}`)?.classList.add('active');
-
   // Update title
   document.getElementById('pageTitle').textContent = PAGE_TITLES[page] || page;
-
+  // Update URL hash (for deep linking)
+  if (history.replaceState) {
+    history.replaceState(null, '', `#${page}`);
+  }
   // Close mobile sidebar
   closeSidebar();
-
   // Lazy load page data
   if (page === 'detections') loadDetections();
   if (page === 'team')       loadTeam();
@@ -2021,7 +2025,51 @@ function timeAgo(iso) {
 }
 
 // ── Boot ──────────────────────────────────────────────────────
+
+// Deep linking support (added 2026-05-27)
+const VALID_HASH_PAGES = ['overview', 'detections', 'team', 'reports', 'billing', 'settings'];
+
+// Override navigate() to update URL hash
+const originalNavigate = navigate;
+navigate = async function(page) {
+  await originalNavigate(page);
+  if (history.replaceState && VALID_HASH_PAGES.includes(page)) {
+    history.replaceState(null, '', `#${page}`);
+  }
+};
+
+// Listen for hash changes (browser back/forward)
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '');
+  if (hash && VALID_HASH_PAGES.includes(hash)) {
+    navigate(hash);
+  }
+});
+
+// Apply initial hash after init completes
+function applyInitialHash() {
+  const checkInit = setInterval(() => {
+    if (userData && companyData) {
+      clearInterval(checkInit);
+      const hash = window.location.hash.replace('#', '');
+      if (hash && VALID_HASH_PAGES.includes(hash)) {
+        navigate(hash);
+      }
+    }
+  }, 100);
+  setTimeout(() => clearInterval(checkInit), 10000);
+}
+
 init();
+   // Handle browser back/forward with hash changes
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '');
+  const validPages = ['overview', 'detections', 'team', 'reports', 'billing', 'settings'];
+  if (hash && validPages.includes(hash)) {
+    navigate(hash);
+  }
+});
+applyInitialHash();
 </script>
 </body>
 </html>
