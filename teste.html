@@ -98,7 +98,7 @@
 
   /* HERO PRODUCT PANEL */
   .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);overflow:hidden}
-  .panel-top{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg-soft);border-bottom:1px solid var(--line)}
+  .panel-top{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg-soft);border-bottom:1px solid var(--line);border-radius:var(--radius) var(--radius) 0 0}
   .panel-top .dots{display:flex;gap:6px}
   .panel-top .dots i{width:10px;height:10px;border-radius:50%;display:block;background:#cfd8e8}
   .panel-top .addr{margin-left:8px;font-family:'IBM Plex Mono';font-size:12px;color:var(--ink-faint);display:flex;align-items:center;gap:6px}
@@ -106,7 +106,7 @@
   .panel{position:relative;overflow:visible}
   .panel-chat{padding:0;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;background:#fff;border-radius:0 0 var(--radius) var(--radius)}
   .pc-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--ink);padding:16px 18px;border-bottom:1px solid var(--line-soft)}
-  .pc-logo{color:#10a37f;font-size:16px}
+  .pc-logo{color:var(--ink);display:flex;align-items:center}
   .pc-input{margin:auto 18px 22px;border:1px solid var(--line);border-radius:16px;padding:15px 16px 10px;box-shadow:0 2px 10px rgba(14,26,51,.05)}
   .pc-input p{font-size:13.5px;color:var(--ink);line-height:1.5;margin-bottom:12px}
   .pc-input .sens{color:var(--ink);font-weight:600;background:#fdecc8;border-radius:3px;padding:0 3px}
@@ -295,6 +295,7 @@
     .vs-col.old{border-right:none;border-bottom:1px solid var(--line)}
     .nav-links{display:none}
     .quote{padding:42px 34px}
+    .quote-row{grid-template-columns:1fr}
   }
   @media(max-width:560px){
     .prob-grid,.feat-grid,.steps,.comp-grid,.stats{grid-template-columns:1fr}
@@ -360,7 +361,7 @@
           </div>
           <div class="panel-chat">
             <div class="pc-brand">
-              <span class="pc-logo">⬡</span> ChatGPT
+              <span class="pc-logo"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .75 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A5.98 5.98 0 0 0 13.26 22a6.05 6.05 0 0 0 5.77-4.2 5.98 5.98 0 0 0 4-2.9 6.05 6.05 0 0 0-.75-7.08Zm-9.02 12.6a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.79.79 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.5 4.49ZM3.6 18.3a4.47 4.47 0 0 1-.54-3.01l.14.09 4.78 2.76a.78.78 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06l-4.83 2.79a4.5 4.5 0 0 1-6.14-1.65Zm-1.26-10.4a4.48 4.48 0 0 1 2.34-1.97v5.68a.78.78 0 0 0 .39.68l5.81 3.35-2.02 1.17a.07.07 0 0 1-.07 0L4.95 13.9a4.5 4.5 0 0 1-1.65-6.14ZM18.7 11.3 12.86 7.93l2.02-1.16a.07.07 0 0 1 .07 0l4.83 2.78a4.5 4.5 0 0 1-.68 8.12v-5.68a.79.79 0 0 0-.39-.68Zm2.01-3.03-.14-.09-4.77-2.78a.79.79 0 0 0-.79 0L9.18 8.78V6.45a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66ZM8.08 12.43 6.05 11.26a.08.08 0 0 1-.03-.05V5.63a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.47 5.02a.79.79 0 0 0-.39.68v6.73Zm1.1-2.37 2.6-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5v-3Z"/></svg></span> ChatGPT
             </div>
             <div class="pc-input">
               <p>Hi ChatGPT, can you help me draft an email to my client at <span class="sens">sarah@acmecorp.com</span> regarding her IBAN <span class="sens">GB29 NWBK 6016 1331 9268 19</span>?</p>
@@ -374,7 +375,7 @@
             <div class="ext-alert-head">
               <div>
                 <span class="ext-eyebrow">SENSITIVE DATA DETECTED</span>
-                <span class="ext-title">4 data types</span>
+                <span class="ext-title">2 data types</span>
               </div>
               <span class="ext-shield"><img src="logo-icon.png" alt="AI Shield"></span>
             </div>
