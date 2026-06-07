@@ -65,6 +65,8 @@
   header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
   nav{display:flex;align-items:center;justify-content:space-between;height:72px}
   .brand{display:flex;align-items:center;gap:11px}
+  .brand-logo{height:46px;width:auto;display:block}
+  footer .brand-logo{height:42px}
   .brand .mark{width:36px;height:36px;flex:none}
   .brand .bn{font-family:'Manrope';font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--ink);line-height:1.1}
   .brand .bn small{display:block;font-weight:600;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);margin-top:0}
@@ -101,20 +103,26 @@
   .panel-top .dots i{width:10px;height:10px;border-radius:50%;display:block;background:#cfd8e8}
   .panel-top .addr{margin-left:8px;font-family:'IBM Plex Mono';font-size:12px;color:var(--ink-faint);display:flex;align-items:center;gap:6px}
   .panel-body{padding:20px}
-  .pb-prompt{font-size:13.5px;color:var(--ink-soft);background:var(--bg-soft);border:1px solid var(--line-soft);border-radius:10px;padding:13px 15px;margin-bottom:14px}
-  .pb-prompt .sens{color:var(--danger);font-weight:600;background:var(--danger-soft);border-radius:3px;padding:0 3px}
-  .pb-alert{border:1px solid var(--danger-line);background:var(--danger-soft);border-radius:11px;padding:15px}
-  .pb-alert-head{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;color:var(--danger);margin-bottom:6px}
-  .pb-alert-head .sh{width:20px;height:20px;flex:none}
-  .pb-alert p{font-size:12.5px;color:#8a3038;margin-bottom:11px;line-height:1.5}
-  .pb-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
-  .pb-tag{font-family:'IBM Plex Mono';font-size:10.5px;font-weight:500;padding:4px 8px;border-radius:5px;background:#fff;border:1px solid var(--danger-line);color:var(--danger)}
-  .pb-actions{display:flex;gap:9px}
-  .pb-act{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px;border-radius:8px}
-  .pb-act.main{background:var(--royal);color:#fff}
-  .pb-act.alt{background:#fff;border:1px solid var(--line);color:var(--ink-soft)}
-  .panel-foot{display:flex;align-items:center;gap:9px;padding:12px 16px;border-top:1px solid var(--line);background:var(--bg-soft);font-size:12px;color:var(--ink-faint)}
-  .panel-foot .lock{color:var(--green);font-weight:800}
+  .panel{position:relative;overflow:visible}
+  .panel-chat{padding:0;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;background:#fff;border-radius:0 0 var(--radius) var(--radius)}
+  .pc-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--ink);padding:16px 18px;border-bottom:1px solid var(--line-soft)}
+  .pc-logo{color:#10a37f;font-size:16px}
+  .pc-input{margin:auto 18px 22px;border:1px solid var(--line);border-radius:16px;padding:15px 16px 10px;box-shadow:0 2px 10px rgba(14,26,51,.05)}
+  .pc-input p{font-size:13.5px;color:var(--ink);line-height:1.5;margin-bottom:12px}
+  .pc-input .sens{color:var(--ink);font-weight:600;background:#fdecc8;border-radius:3px;padding:0 3px}
+  .pc-input-bar{display:flex;align-items:center;justify-content:space-between}
+  .pc-plus{width:26px;height:26px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:16px}
+  .pc-send{width:30px;height:30px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+  .ext-alert{position:absolute;top:54px;right:-18px;width:280px;background:linear-gradient(155deg,#e0342f,#c0271f);border-radius:14px;padding:14px 15px;box-shadow:0 18px 40px -10px rgba(192,39,31,.55);z-index:5}
+  .ext-alert-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:13px}
+  .ext-eyebrow{display:block;font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:3px}
+  .ext-title{display:block;font-family:'Manrope';font-weight:800;font-size:18px;color:#fff;letter-spacing:-.01em}
+  .ext-shield{width:30px;height:30px;background:rgba(255,255,255,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+  .ext-shield img{width:20px;height:20px;filter:brightness(0) invert(1)}
+  .ext-actions{display:flex;gap:9px}
+  .ext-btn{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px;border-radius:9px;font-family:'Manrope'}
+  .ext-btn.remove{background:rgba(0,0,0,.22);color:#fff}
+  .ext-btn.send{background:rgba(255,255,255,.16);color:rgba(255,255,255,.9)}
 
   /* PLATFORM STRIP */
   .strip{padding:34px 0;background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -193,6 +201,15 @@
   .quote .meta-txt b{font-family:'Manrope';font-size:15.5px;display:block}
   .quote .meta-txt span{font-size:13.5px;color:#a9bce0}
   .quote .pilot{margin-top:18px;font-size:12px;color:#7e93bd;font-style:italic}
+  .quote-row{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:920px;margin:22px auto 0}
+  .quote-sm{background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px 32px;box-shadow:var(--shadow-sm)}
+  .quote-sm .stars{color:#e8a700;font-size:14px;letter-spacing:2px;margin-bottom:14px}
+  .quote-sm blockquote{font-size:15.5px;font-weight:600;line-height:1.55;color:var(--ink);letter-spacing:-.01em}
+  .quote-sm .meta{margin-top:20px;display:flex;align-items:center;gap:12px}
+  .quote-sm .av.sm{width:40px;height:40px;font-size:14px;border-radius:50%;background:linear-gradient(135deg,var(--royal),#4a82f0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+  .quote-sm .meta-txt b{font-family:'Manrope';font-size:14.5px;display:block;color:var(--ink)}
+  .quote-sm .meta-txt span{font-size:12.5px;color:var(--ink-faint)}
+  .pilot-note{text-align:center;margin-top:30px;font-size:12.5px;color:var(--ink-faint);font-style:italic}
 
   /* COMPLIANCE */
   .comp{background:var(--bg-soft)}
@@ -294,15 +311,8 @@
 <header>
   <div class="wrap">
     <nav>
-      <a href="#" class="brand">
-        <svg class="mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 3L7 10v12c0 10.5 7.2 19.3 17 22 9.8-2.7 17-11.5 17-22V10L24 3z" fill="url(#bg1)"/>
-          <path d="M24 3v41c9.8-2.7 17-11.5 17-22V10L24 3z" fill="#0f2f7a"/>
-          <circle cx="19.5" cy="18" r="1.8" fill="#cfe0ff"/><circle cx="28" cy="24" r="1.8" fill="#cfe0ff"/><circle cx="19.5" cy="30" r="1.8" fill="#cfe0ff"/>
-          <path d="M19.5 18h5.5l3 6-3 6h-5.5" stroke="#cfe0ff" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
-          <defs><linearGradient id="bg1" x1="7" y1="3" x2="41" y2="44"><stop stop-color="#2f6ae6"/><stop offset="1" stop-color="#1849b8"/></linearGradient></defs>
-        </svg>
-        <span class="bn">AI Shield<small>Compliance Auditor</small></span>
+      <a href="https://www.getaishield.co/" class="brand">
+        <img src="logo_full.png" alt="AI Shield — Compliance Auditor" class="brand-logo">
       </a>
       <div class="nav-links">
         <a href="#problem">The Problem</a>
@@ -348,24 +358,31 @@
             <div class="dots"><i></i><i></i><i></i></div>
             <span class="addr">🔒 chatgpt.com</span>
           </div>
-          <div class="panel-body">
-            <div class="pb-prompt">Draft a reply to a customer about a double charge — name <span class="sens">João Silva</span>, IBAN <span class="sens">PT50 0002 0123 1234 5678</span>, phone <span class="sens">+351 912 345 678</span>.</div>
-            <div class="pb-alert">
-              <div class="pb-alert-head">
-                <svg class="sh" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6c0 5 3.4 9.4 8 10.5C16.6 20.4 20 16 20 11V5l-8-3z" fill="#d62839" opacity=".15"/><path d="M12 2L4 5v6c0 5 3.4 9.4 8 10.5C16.6 20.4 20 16 20 11V5l-8-3z" stroke="#d62839" stroke-width="1.5"/><path d="M12 8v4M12 15.5v.5" stroke="#d62839" stroke-width="1.8" stroke-linecap="round"/></svg>
-                Sensitive data blocked
-              </div>
-              <p>AI Shield detected personal data that would breach GDPR Art. 32 if shared with this AI tool.</p>
-              <div class="pb-tags">
-                <span class="pb-tag">IBAN</span><span class="pb-tag">FULL NAME · PII</span><span class="pb-tag">PHONE NUMBER</span>
-              </div>
-              <div class="pb-actions">
-                <span class="pb-act main">Remove &amp; continue</span>
-                <span class="pb-act alt">Review</span>
+          <div class="panel-chat">
+            <div class="pc-brand">
+              <span class="pc-logo">⬡</span> ChatGPT
+            </div>
+            <div class="pc-input">
+              <p>Hi ChatGPT, can you help me draft an email to my client at <span class="sens">sarah@acmecorp.com</span> regarding her IBAN <span class="sens">GB29 NWBK 6016 1331 9268 19</span>?</p>
+              <div class="pc-input-bar">
+                <span class="pc-plus">+</span>
+                <span class="pc-send">↑</span>
               </div>
             </div>
           </div>
-          <div class="panel-foot"><span class="lock">●</span> Scanned locally · logged for your DPO · nothing sent to our servers</div>
+          <div class="ext-alert">
+            <div class="ext-alert-head">
+              <div>
+                <span class="ext-eyebrow">SENSITIVE DATA DETECTED</span>
+                <span class="ext-title">4 data types</span>
+              </div>
+              <span class="ext-shield"><img src="logo-icon.png" alt="AI Shield"></span>
+            </div>
+            <div class="ext-actions">
+              <span class="ext-btn remove">Remove data</span>
+              <span class="ext-btn send">Send anyway</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -537,15 +554,37 @@
 <!-- TESTIMONIAL -->
 <section class="sec" style="background:var(--bg-soft)">
   <div class="wrap">
+    <div class="sec-head reveal" style="margin-bottom:44px">
+      <span class="kicker">What customers say</span>
+      <h2>Security teams see the gap close on day one.</h2>
+    </div>
     <div class="quote reveal">
       <div class="stars">★★★★★</div>
       <blockquote>"In the first week it <span class="hl">caught three people pasting client contract data into ChatGPT</span> — something we had no visibility into before. Setup genuinely took under five minutes, and it paid for itself immediately."</blockquote>
       <div class="meta">
         <div class="av">MK</div>
-        <div class="meta-txt"><b>Markus K.</b><span>Data Protection Officer · SaaS company</span></div>
+        <div class="meta-txt"><b>Markus K.</b><span>Data Protection Officer · B2B SaaS</span></div>
       </div>
-      <div class="pilot">Pilot customer testimonial. Named references available to qualified prospects on request.</div>
     </div>
+    <div class="quote-row">
+      <div class="quote-sm reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"The audit export did the heavy lifting in our GDPR review. Instead of guessing whether staff were sharing data with AI tools, I had a documented log to hand our DPA. That changed the whole conversation."</blockquote>
+        <div class="meta">
+          <div class="av sm">SR</div>
+          <div class="meta-txt"><b>Sofia R.</b><span>Head of Compliance · Financial services</span></div>
+        </div>
+      </div>
+      <div class="quote-sm reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"We looked at the enterprise DLP suites and they were overkill for a 40-person firm. AI Shield was the only one that felt purpose-built for GDPR and deployed without an IT project."</blockquote>
+        <div class="meta">
+          <div class="av sm">PL</div>
+          <div class="meta-txt"><b>Pierre L.</b><span>IT Manager · Legal practice</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="pilot-note reveal">Testimonials from pilot customers. Named references available to qualified prospects on request.</p>
   </div>
 </section>
 
@@ -695,15 +734,8 @@
 <footer>
   <div class="wrap">
     <div class="foot-grid">
-      <a href="#" class="brand">
-        <svg class="mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 3L7 10v12c0 10.5 7.2 19.3 17 22 9.8-2.7 17-11.5 17-22V10L24 3z" fill="url(#bg2)"/>
-          <path d="M24 3v41c9.8-2.7 17-11.5 17-22V10L24 3z" fill="#0f2f7a"/>
-          <circle cx="19.5" cy="18" r="1.8" fill="#cfe0ff"/><circle cx="28" cy="24" r="1.8" fill="#cfe0ff"/><circle cx="19.5" cy="30" r="1.8" fill="#cfe0ff"/>
-          <path d="M19.5 18h5.5l3 6-3 6h-5.5" stroke="#cfe0ff" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
-          <defs><linearGradient id="bg2" x1="7" y1="3" x2="41" y2="44"><stop stop-color="#2f6ae6"/><stop offset="1" stop-color="#1849b8"/></linearGradient></defs>
-        </svg>
-        <span class="bn">AI Shield<small>Compliance Auditor</small></span>
+      <a href="https://www.getaishield.co/" class="brand">
+        <img src="logo_full.png" alt="AI Shield — Compliance Auditor" class="brand-logo">
       </a>
       <div class="foot-links">
         <a href="https://www.getaishield.co/privacy.html">Privacy Policy</a>
