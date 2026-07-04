@@ -62,15 +62,48 @@ th{padding:11px 22px;text-align:left;font-size:11px;font-weight:600;color:var(--
 td{padding:14px 22px;font-size:13.5px;color:var(--ink-mid);border-bottom:1px solid var(--surface-2)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--surface-2)}
+tbody tr.clickable{cursor:pointer}
 .badge{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .badge-success{background:var(--success-g);color:var(--success)}
 .badge-danger{background:var(--danger-g);color:var(--danger)}
 .badge-info{background:var(--accent-g);color:var(--accent)}
+.badge-muted{background:var(--surface-3);color:var(--muted)}
+.badge-stage-lead{background:var(--surface-3);color:var(--muted)}
+.badge-stage-pilot{background:var(--accent-g);color:var(--accent)}
+.badge-stage-paying{background:var(--success-g);color:var(--success)}
+.badge-stage-churned{background:var(--danger-g);color:var(--danger)}
 .loading{text-align:center;padding:40px;color:var(--muted)}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-state{text-align:center;padding:56px 20px;color:var(--muted)}
 .empty-state-icon{font-size:40px;margin-bottom:14px;opacity:.4}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,17,23,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;z-index:500;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:var(--r-lg);width:100%;max-width:720px;box-shadow:0 24px 70px rgba(0,0,0,.3);animation:modalUp .25s ease}
+@keyframes modalUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:22px 24px;border-bottom:1px solid var(--border)}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em}
+.modal-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.modal-close{background:none;border:none;font-size:24px;color:var(--muted);cursor:pointer;line-height:1;padding:0 4px}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:22px 24px}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 0 10px}
+.section-label:first-child{margin-top:0}
+.kv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.kv{background:var(--surface-2);border-radius:10px;padding:12px 14px}
+.kv-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.kv-value{font-size:15px;font-weight:600;color:var(--ink)}
+.stage-selector{display:flex;gap:8px;flex-wrap:wrap}
+.stage-btn{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-mid);transition:all .15s}
+.stage-btn:hover{border-color:var(--border-2)}
+.stage-btn.active{border-color:transparent;color:#fff}
+.stage-btn.active[data-stage="lead"]{background:var(--muted)}
+.stage-btn.active[data-stage="pilot"]{background:var(--accent)}
+.stage-btn.active[data-stage="paying"]{background:var(--success)}
+.stage-btn.active[data-stage="churned"]{background:var(--danger)}
+.mini-table th{padding:8px 10px;font-size:10.5px}
+.mini-table td{padding:9px 10px;font-size:12.5px}
 @media(max-width:600px){.container{padding:16px}.navbar{padding:0 16px}.navbar-user span{display:none}}
 </style>
 </head>
@@ -123,10 +156,10 @@ tbody tr:hover td{background:var(--surface-2)}
         <div class="table-container">
           <table>
             <thead><tr>
-              <th>Company Name</th><th>Admin Email</th><th>Plan</th><th>Users</th><th>Detections</th><th>Status</th><th>Created</th>
+              <th>Company Name</th><th>Admin Email</th><th>Plan</th><th>Users</th><th>Detections</th><th>Status</th><th>Stage</th><th>Created</th>
             </tr></thead>
             <tbody id="companiesTableBody">
-              <tr><td colspan="7"><div class="loading"><div class="spinner"></div>Loading companies...</div></td></tr>
+              <tr><td colspan="8"><div class="loading"><div class="spinner"></div>Loading companies...</div></td></tr>
             </tbody>
           </table>
         </div>
@@ -134,9 +167,25 @@ tbody tr:hover td{background:var(--surface-2)}
     </div>
   </div>
 </div>
+
+<!-- Company detail modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="mTitle">Company</div>
+        <div class="modal-sub" id="mSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <script>
 const BACKEND_URL = 'https://ai-shield-backend-production.up.railway.app';
 let adminPassword = '';
+
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const password = document.getElementById('adminPassword').value;
@@ -158,6 +207,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     document.getElementById('loginError').classList.add('show');
   }
 });
+
 function logout() {
   adminPassword = '';
   document.getElementById('dashboard').classList.remove('show');
@@ -165,9 +215,11 @@ function logout() {
   document.getElementById('adminPassword').value = '';
   document.getElementById('loginError').classList.remove('show');
 }
+
 async function loadDashboard() {
   await Promise.all([loadStats(), loadCompanies()]);
 }
+
 async function loadStats() {
   try {
     const response = await fetch(BACKEND_URL + '/api/admin/stats', { headers: { 'admin-password': adminPassword } });
@@ -180,6 +232,16 @@ async function loadStats() {
     }
   } catch (error) { console.error('Error loading stats:', error); }
 }
+
+function stageBadge(stage) {
+  const s = stage || 'lead';
+  return '<span class="badge badge-stage-' + s + '">' + s + '</span>';
+}
+
+function fmtDate(d) {
+  try { return new Date(d).toLocaleDateString('en-GB'); } catch (e) { return '—'; }
+}
+
 async function loadCompanies() {
   try {
     const response = await fetch(BACKEND_URL + '/api/admin/companies', { headers: { 'admin-password': adminPassword } });
@@ -187,25 +249,117 @@ async function loadCompanies() {
     const companies = data.companies || [];
     const tbody = document.getElementById('companiesTableBody');
     if (companies.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">&#128202;</div><p>No companies found</p></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">&#128202;</div><p>No companies found</p></div></td></tr>';
       return;
     }
     tbody.innerHTML = companies.map(function(company){
-      return '<tr>' +
+      return '<tr class="clickable" onclick="openCompany(\'' + company.id + '\')">' +
       '<td><strong style="color:var(--ink)">' + (company.name||'—') + '</strong></td>' +
       '<td>' + (company.admin_email||'—') + '</td>' +
       '<td><span class="badge badge-info">' + ((company.plan_type||'—').toUpperCase()) + '</span></td>' +
       '<td>' + (company.user_count||0) + ' / ' + (company.max_users||'—') + '</td>' +
       '<td>' + (company.detection_count||0) + '</td>' +
       '<td><span class="badge ' + (company.is_active?'badge-success':'badge-danger') + '">' + (company.is_active?'Active':'Inactive') + '</span></td>' +
-      '<td>' + new Date(company.created_at).toLocaleDateString('en-GB') + '</td>' +
+      '<td>' + stageBadge(company.pipeline_stage) + '</td>' +
+      '<td>' + fmtDate(company.created_at) + '</td>' +
       '</tr>';
     }).join('');
   } catch (error) {
     console.error('Error loading companies:', error);
-    document.getElementById('companiesTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:24px">Error loading companies</td></tr>';
+    document.getElementById('companiesTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--danger);padding:24px">Error loading companies</td></tr>';
   }
 }
+
+function kv(label, value) {
+  return '<div class="kv"><div class="kv-label">' + label + '</div><div class="kv-value">' + value + '</div></div>';
+}
+
+async function openCompany(id) {
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  document.getElementById('mTitle').textContent = 'Loading…';
+  document.getElementById('mSub').textContent = '';
+  body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+  overlay.classList.add('show');
+  try {
+    const r = await fetch(BACKEND_URL + '/api/admin/companies/' + id, { headers: { 'admin-password': adminPassword } });
+    const data = await r.json();
+    if (!data.success) { body.innerHTML = '<p style="color:var(--danger)">Failed to load company.</p>'; return; }
+    renderCompany(data);
+  } catch (e) {
+    body.innerHTML = '<p style="color:var(--danger)">Error loading company.</p>';
+  }
+}
+
+function renderCompany(d) {
+  const c = d.company;
+  const s = d.subscription;
+  const det = d.detections || {};
+  const members = d.members || [];
+
+  document.getElementById('mTitle').textContent = c.name || '—';
+  document.getElementById('mSub').textContent = 'Code: ' + (c.company_code || '—') + '  ·  Created ' + fmtDate(c.created_at);
+
+  const stages = ['lead', 'pilot', 'paying', 'churned'];
+  const stageBtns = stages.map(function(st){
+    const active = (c.pipeline_stage === st) ? ' active' : '';
+    const label = st.charAt(0).toUpperCase() + st.slice(1);
+    return '<button class="stage-btn' + active + '" data-stage="' + st + '" onclick="changeStage(\'' + c.id + '\',\'' + st + '\')">' + label + '</button>';
+  }).join('');
+
+  const subHtml = s
+    ? (kv('Plan', s.plan || '—') + kv('Status', s.status || '—') + kv('Billing', s.billing_cycle || '—') + kv('Trial ends', s.trial_ends_at ? fmtDate(s.trial_ends_at) : '—'))
+    : '<p style="font-size:13px;color:var(--muted)">No subscription.</p>';
+
+  const detHtml = kv('Total', det.total || 0) + kv('Last 30d', det.last_30d || 0) + kv('Removed', det.removed || 0) + kv('Sent anyway', det.sent_anyway || 0);
+
+  const topTypes = (det.top_types && det.top_types.length)
+    ? det.top_types.map(function(t){ return '<span class="badge badge-info" style="margin:0 6px 6px 0">' + t.data_type + ' · ' + t.count + '</span>'; }).join('')
+    : '<span style="font-size:13px;color:var(--muted)">None yet</span>';
+
+  const membersRows = members.length
+    ? members.map(function(m){
+        return '<tr><td>' + (m.name||'—') + '</td><td>' + m.email + '</td><td><span class="badge ' + (m.role==='manager'?'badge-info':'badge-muted') + '">' + m.role + '</span></td><td>' + (m.is_active?'Active':'Inactive') + '</td></tr>';
+      }).join('')
+    : '<tr><td colspan="4" style="color:var(--muted)">No members yet.</td></tr>';
+
+  document.getElementById('modalBody').innerHTML =
+    '<div class="section-label">Pipeline stage</div><div class="stage-selector">' + stageBtns + '</div>' +
+    '<div class="section-label">Subscription</div><div class="kv-grid">' + subHtml + '</div>' +
+    '<div class="section-label">Detections</div><div class="kv-grid">' + detHtml + '</div>' +
+    '<div class="section-label">Top data types</div><div>' + topTypes + '</div>' +
+    '<div class="section-label">Members (' + members.length + ')</div>' +
+    '<div class="table-container"><table class="mini-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead><tbody>' + membersRows + '</tbody></table></div>';
+}
+
+async function changeStage(id, stage) {
+  try {
+    const r = await fetch(BACKEND_URL + '/api/admin/companies/' + id + '/stage', {
+      method: 'PATCH',
+      headers: { 'admin-password': adminPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stage: stage })
+    });
+    const data = await r.json();
+    if (data.success) {
+      document.querySelectorAll('.stage-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.stage === stage);
+      });
+      loadCompanies();
+    } else {
+      alert('Could not update stage.');
+    }
+  } catch (e) {
+    console.error('changeStage error:', e);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeModal();
+});
 </script>
 </body>
 </html>
